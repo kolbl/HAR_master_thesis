@@ -1,0 +1,91 @@
+TIMESTAMP;OBJECT;STATE;HABITANT
+2017/11/21 16:19:02.0;M01;Open;Mario
+2017/11/21 16:19:13.0;M01;Close;Mario
+2017/11/21 16:21:59.0;D01;Open;Mario
+2017/11/21 16:22:12.0;D01;Close;Mario
+2017/11/21 16:22:14.0;D08;Open;Mario
+2017/11/21 16:22:17.0;D08;Close;Mario
+2017/11/21 16:22:29.0;D02;Open;Mario
+2017/11/21 16:22:33.0;D02;Close;Mario
+2017/11/21 16:22:36.0;SM1;No movement;Mario
+2017/11/21 16:22:38.0;SM1;Movement;Mario
+2017/11/21 16:22:49.0;SM1;No movement;Mario
+2017/11/21 16:23:25.0;D05;Open;Mario
+2017/11/21 16:23:29.0;D05;Open;Mario
+2017/11/21 16:23:35.0;SM1;Movement;Mario
+2017/11/21 16:23:35.0;D05;Open;Mario
+2017/11/21 16:23:55.0;D05;Open;Mario
+2017/11/21 16:24:04.0;D05;Open;Mario
+2017/11/21 16:24:06.0;D02;Open;Mario
+2017/11/21 16:24:08.0;D02;Close;Mario
+2017/11/21 16:25:17.0;SM1;Movement;Mario
+2017/11/21 16:26:06.0;SM1;No movement;Mario
+2017/11/21 16:26:55.0;SM1;Movement;Mario
+2017/11/21 16:27:04.0;SM1;No movement;Mario
+2017/11/21 16:28:50.0;SM1;Movement;Mario
+2017/11/21 16:29:04.0;SM1;No movement;Mario
+2017/11/21 16:31:20.0;SM1;Movement;Mario
+2017/11/21 16:31:55.0;SM1;No movement;Mario
+2017/11/21 16:32:06.0;D04;Open;Mario
+2017/11/21 16:32:10.0;D04;Close;Mario
+2017/11/21 16:32:11.0;SM1;Movement;Mario
+2017/11/21 16:32:14.0;C05;Open;Mario
+2017/11/21 16:32:34.0;C05;Close;Mario
+2017/11/21 16:32:43.0;C01;Open;Mario
+2017/11/21 16:32:44.0;SM1;No movement;Mario
+2017/11/21 16:32:51.0;C01;Close;Mario
+2017/11/21 16:33:25.0;D05;Open;Mario
+2017/11/21 16:34:11.0;D05;Close;Mario
+2017/11/21 16:35:57.0;SM3;No movement;Mario
+2017/11/21 16:36:11.0;SM4;No movement;Mario
+2017/11/21 16:36:15.0;SM4;Movement;Mario
+2017/11/21 16:36:19.0;SM3;Movement;Mario
+2017/11/21 16:36:27.0;C09;Open;Mario
+2017/11/21 16:36:40.0;SM4;No movement;Mario
+2017/11/21 16:36:40.0;SM3;No movement;Mario
+2017/11/21 16:36:43.0;SM4;Movement;Mario
+2017/11/21 16:36:43.0;SM3;Movement;Mario
+2017/11/21 16:36:53.0;C09;Close;Mario
+2017/11/21 16:37:17.0;SM3;No movement;Mario
+2017/11/21 16:37:24.0;SM4;No movement;Mario
+2017/11/21 16:37:33.0;SM5;No movement;Mario
+2017/11/21 16:38:43.0;SM5;Movement;Mario
+2017/11/21 16:38:53.0;SM5;No movement;Mario
+2017/11/21 16:41:56.0;SM5;Movement;Mario
+2017/11/21 16:42:06.0;SM4;Movement;Mario
+2017/11/21 16:42:06.0;S09;Pressure;Mario
+2017/11/21 16:42:08.0;SM3;Movement;Mario
+2017/11/21 16:42:16.0;SM5;No movement;Mario
+2017/11/21 16:42:16.0;SM4;No movement;Mario
+2017/11/21 16:42:16.0;D07;Open;Mario
+2017/11/21 16:42:38.0;SM3;No movement;Mario
+2017/11/21 16:42:56.0;SM3;Movement;Mario
+2017/11/21 16:43:02.0;C10;Open;Mario
+2017/11/21 16:43:11.0;C10;Close;Mario
+2017/11/21 16:43:11.0;D07;Close;Mario
+2017/11/21 16:43:17.0;SM4;Movement;Mario
+2017/11/21 16:43:21.0;SM5;Movement;Mario
+2017/11/21 16:43:26.0;SM3;No movement;Mario
+2017/11/21 16:43:27.0;S09;No Pressure;Mario
+2017/11/21 16:43:32.0;SM4;No movement;Mario
+2017/11/21 16:43:35.0;S09;No Pressure;Mario
+2017/11/21 16:43:36.0;SM5;No movement;Mario
+2017/11/21 16:44:33.0;S09;No Pressure;Mario
+2017/11/21 16:46:23.0;S09;Pressure;Mario
+2017/11/21 16:46:24.0;S09;No Pressure;Mario
+2017/11/21 16:46:25.0;S09;Pressure;Mario
+2017/11/21 16:46:26.0;S09;No Pressure;Mario
+2017/11/21 16:47:29.0;SM5;Movement;Mario
+2017/11/21 16:47:36.0;S09;Pressure;Mario
+2017/11/21 16:47:54.0;SM5;No movement;Mario
+2017/11/21 16:48:03.0;D03;Open;Mario
+2017/11/21 16:48:54.0;C13;Open;Mario
+2017/11/21 16:49:08.0;D03;Close;Mario
+2017/11/21 16:49:20.0;SM4;No movement;Mario
+2017/11/21 16:49:36.0;C14;No Pressure;Mario
+2017/11/21 16:49:38.0;C13;Close;Mario
+2017/11/21 16:49:52.0;SM4;No movement;Mario
+2017/11/21 16:50:19.0;SM4;Movement;Mario
+2017/11/21 16:50:29.0;SM4;No movement;Mario
+2017/11/21 16:50:31.0;SM4;Movement;Mario
+2017/11/21 16:50:41.0;SM4;No movement;Mario

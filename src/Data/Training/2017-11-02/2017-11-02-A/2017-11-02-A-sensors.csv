@@ -1,0 +1,50 @@
+TIMESTAMP;OBJECT;STATE;HABITANT
+2017/11/02 10:05:08.0;C14;Pressure;Mario 
+2017/11/02 10:05:10.0;C14;No Pressure;Mario 
+2017/11/02 10:05:23.0;C14;No Pressure;Mario 
+2017/11/02 10:05:26.0;C14;Pressure;Mario 
+2017/11/02 10:05:29.0;C14;No Pressure;Mario 
+2017/11/02 10:06:27.0;C14;Pressure;Mario 
+2017/11/02 10:07:51.0;C14;No Pressure;Mario 
+2017/11/02 10:07:57.0;C14;Pressure;Mario 
+2017/11/02 10:07:58.0;SM4;Movement;Mario 
+2017/11/02 10:08:00.0;C14;Pressure;Mario 
+2017/11/02 10:08:48.0;D10;Open;Mario 
+2017/11/02 10:09:05.0;D10;Close;Mario 
+2017/11/02 10:09:17.0;H01;Open;Mario 
+2017/11/02 10:09:22.0;SM1;No movement;Mario 
+2017/11/02 10:09:45.0;SM1;Movement;Mario 
+2017/11/02 10:09:46.0;D04;Open;Mario 
+2017/11/02 10:09:49.0;D04;Close;Mario 
+2017/11/02 10:10:40.0;SM1;No movement;Mario 
+2017/11/02 10:10:41.0;SM1;Movement;Mario 
+2017/11/02 10:10:56.0;SM1;No movement;Mario 
+2017/11/02 10:11:21.0;SM1;Movement;Mario 
+2017/11/02 10:11:30.0;SM1;No movement;Mario 
+2017/11/02 10:12:52.0;SM1;Movement;Mario 
+2017/11/02 10:13:02.0;SM1;No movement;Mario 
+2017/11/02 10:14:47.0;SM1;Movement;Mario 
+2017/11/02 10:15:56.0;SM3;No movement;Mario 
+2017/11/02 10:16:09.0;SM4;No movement;Mario 
+2017/11/02 10:16:19.0;SM4;Movement;Mario 
+2017/11/02 10:16:34.0;SM3;Movement;Mario 
+2017/11/02 10:16:34.0;C09;Open;Mario 
+2017/11/02 10:16:44.0;SM4;No movement;Mario 
+2017/11/02 10:16:45.0;SM4;Movement;Mario 
+2017/11/02 10:16:47.0;C09;Close;Mario 
+2017/11/02 10:17:24.0;SM3;No movement;Mario 
+2017/11/02 10:17:27.0;D03;Open;Mario 
+2017/11/02 10:17:49.0;C13;Open;Mario 
+2017/11/02 10:18:07.0;D03;Close;Mario 
+2017/11/02 10:18:12.0;SM1;Movement;Mario 
+2017/11/02 10:18:13.0;C12;No present;Mario 
+2017/11/02 10:18:20.0;SM4;No movement;Mario 
+2017/11/02 10:18:35.0;C12;Present;Mario 
+2017/11/02 10:18:37.0;SM4;Movement;Mario 
+2017/11/02 10:18:42.0;D03;Open;Mario 
+2017/11/02 10:18:47.0;SM1;No movement;Mario 
+2017/11/02 10:18:51.0;D03;Close;Mario 
+2017/11/02 10:19:39.0;M01;Open;Mario 
+2017/11/02 10:19:44.0;SM4;Movement;Mario 
+2017/11/02 10:19:46.0;M01;Close;Mario 
+2017/11/02 10:19:54.0;SM4;No movement;Mario 

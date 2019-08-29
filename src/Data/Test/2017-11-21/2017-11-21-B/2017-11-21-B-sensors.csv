@@ -1,0 +1,20 @@
+TIMESTAMP;OBJECT;STATE;HABITANT
+2017/11/21 16:13:13.0;D03;Open;Mario
+2017/11/21 16:13:49.0;C13;Open;Mario
+2017/11/21 16:13:57.0;C13;Close;Mario
+2017/11/21 16:13:57.0;D03;Close;Mario
+2017/11/21 16:14:09.0;SM1;Movement;Mario
+2017/11/21 16:14:17.0;SM4;No movement;Mario
+2017/11/21 16:14:32.0;SM4;Movement;Mario
+2017/11/21 16:14:57.0;SM4;No movement;Mario
+2017/11/21 16:14:59.0;SM4;Movement;Mario
+2017/11/21 16:15:05.0;SM3;No movement;Mario
+2017/11/21 16:15:20.0;SM4;No movement;Mario
+2017/11/21 16:15:25.0;SM4;Movement;Mario
+2017/11/21 16:15:28.0;SM3;Movement;Mario
+2017/11/21 16:15:34.0;C09;Open;Mario
+2017/11/21 16:15:46.0;C09;Close;Mario
+2017/11/21 16:16:08.0;SM3;No movement;Mario
+2017/11/21 16:16:10.0;SM4;No movement;Mario
+2017/11/21 16:16:21.0;M01;Open;Mario
+2017/11/21 16:16:26.0;M01;Close;Mario
