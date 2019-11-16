@@ -53,7 +53,7 @@ from keras import regularizers
 import talos as talos
 import seaborn as sns
 from sklearn.model_selection import GridSearchCV
-from tsfresh import extract_features
+# from tsfresh import extract_features
 import warnings
 import sklearn.exceptions
 import autokeras as ak
@@ -82,6 +82,7 @@ from keras import backend as K
 from keras import optimizers
 from time import time
 from tensorflow.python.keras.callbacks import TensorBoard
+import tikzplotlib
 
 class Machine_Learn_Static(object):
     def __init__(self):
