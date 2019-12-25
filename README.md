@@ -26,6 +26,7 @@ standard machine learning algorithms being used for classification:
 
 
 Additionally, several deep learning algorithms are being explored:
+* MLP
 * CNN
 * LSTM
 * CNN with LSTM layers
@@ -43,6 +44,7 @@ keras, numpy, matplotlib, talos and sci-kit learn.
 ```
 src/
 ├── activities.csv -- list of all types of activities of daily living
+├── frequencies.csv -- list of all frequencies of activities for testing and training data set
 ├── labels_training_set.csv -- timestamp, segment and activity of training set
 ├── documentation/  
 │   └── 2019-08-31_thesis.pdf -- thesis draft

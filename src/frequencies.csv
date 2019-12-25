@@ -1,0 +1,25 @@
+activity,training,testing
+Take medication ,7,3
+Prepare breakfast,7,3
+Prepare lunch,6,2
+Prepare dinner ,7,3
+Breakfast,7,3
+Lunch,6,2
+Dinner,7,3
+Eat a snack,5,0
+Watch TV,6,1
+Enter the SmartLab ,12,5
+Play a videogame ,1,1
+Relax on the sofa ,1,6
+Leave the SmartLab,9,5
+Visit in the SmartLab ,1,1
+Put waste in the bin ,11,4
+Wash hands,6,3
+Brush teeth,21,9
+Use the toilet,10,2
+Wash dishes,2,3
+Put washing into the washing machine,6,0
+Work at the table ,2,3
+Dressing,15,8
+Go to the bed,7,4
+Wake up,7,3
