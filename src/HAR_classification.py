@@ -83,6 +83,9 @@ from keras import optimizers
 from time import time
 from tensorflow.python.keras.callbacks import TensorBoard
 import tikzplotlib
+import matplotlib
+from matplotlib.backends.backend_pgf import FigureCanvasPgf
+
 
 class Machine_Learn_Static(object):
     def __init__(self):
@@ -827,6 +830,16 @@ def HAR_classification():
     # read a dataset
 
     classification = Machine_Learn_Static()
+
+    matplotlib.backend_bases.register_backend('pdf', FigureCanvasPgf)
+    plt.rcParams.update({
+        "pgf.texsystem": "pdflatex",
+        "pgf.preamble": [
+             r"\usepackage[utf8x]{inputenc}",
+             r"\usepackage[T1]{fontenc}",
+             r"\usepackage{cmbright}",
+             ]
+    })
     training_samples = pd.read_csv("samples-training.csv",  delimiter=";")
     test_samples = pd.read_csv("samples-testing.csv",  delimiter=";")
 
