@@ -80,8 +80,8 @@ from sklearn_crfsuite import metrics
 from keras import metrics
 from keras import backend as K
 from keras import optimizers
-from time import time
-from tensorflow.python.keras.callbacks import TensorBoard
+import time
+from keras.callbacks import TensorBoard
 import tikzplotlib
 import matplotlib
 from matplotlib.backends.backend_pgf import FigureCanvasPgf
@@ -101,7 +101,7 @@ class Machine_Learn_Static(object):
         self.ada = AdaBoostClassifier()  # using ada boost
         self.nn = MLPClassifier(activation='relu', early_stopping=True, hidden_layer_sizes=(5,5), max_iter=500,
                                 shuffle=False, solver='sgd', validation_fraction=0.2,
-                                batch_size=5, learning_rate='adaptive', learning_rate_init=0.0001)   # using neural network
+                                batch_size=5, learning_rate='adaptive', learning_rate_init=0.0001)   # using Multilayer Perceptron
 
 
 
@@ -110,11 +110,14 @@ class Machine_Learn_Static(object):
     # use sklearn logic regression / example program
     def logic_regress_fit(self, x_train, y_train, x_test, y_test, metrics):
         # Now use sklearn to train dataset
+        start = time.time()
         model = self.regressor.fit(x_train, y_train)
+        stop = time.time()
+        print(f"Logistic Regression training time: {stop - start}s")
         predict = self.regressor.predict(x_test)
         prob = self.regressor.predict_proba(x_test)
-        print(prob)
-        proba = pd.DataFrame(prob)
+        # print(prob)
+        # proba = pd.DataFrame(prob)
         # proba.to_csv("probabilities.csv", sep=';', encoding='utf-8', index=False)
         metrics = self.print_metrics(model, y_test, x_test, predict, "Logistic Regression", metrics)
         # printing the confusion matrix
@@ -129,10 +132,13 @@ class Machine_Learn_Static(object):
     # # use sklearn naive bayes / example program
     def naive_bayes_regress_fit(self, x_train, y_train, x_test, y_test, metrics):
         # Now use sklearn to train dataset
+        start = time.time()
         model = self.gnb.fit(x_train, y_train)
+        stop = time.time()
+        print(f"Naive Bayes training time: {stop - start}s")
         predict = self.gnb.predict(x_test)
-        prob = self.regressor.predict_proba(x_test)
-        print(prob)
+        # prob = self.regressor.predict_proba(x_test)
+        # print(prob)
         metrics = self.print_metrics(model, y_test, x_test, predict, "Naive Bayes", metrics)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
@@ -143,10 +149,13 @@ class Machine_Learn_Static(object):
     # # use decision tree
     def decision_tree_fit(self, x_train, y_train, x_test, y_test, metrics):
         # Now use decision tree to train dataset
+        start = time.time()
         model = self.dt.fit(x_train, y_train)
+        stop = time.time()
+        print(f"Decision tree training time: {stop - start}s")
         predict = self.dt.predict(x_test)
-        prob = self.regressor.predict_proba(x_test)
-        print(prob)
+        #prob = self.regressor.predict_proba(x_test)
+        #print(prob)
         metrics = self.print_metrics(model, y_test, x_test, predict, "Decision Tree", metrics)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
@@ -160,10 +169,13 @@ class Machine_Learn_Static(object):
     # # use support vector
     def support_vector_fit(self, x_train, y_train, x_test, y_test, metrics):
         # Now use support vector to train dataset
+        start = time.time()
         model = self.svc.fit(x_train, y_train)
+        stop = time.time()
+        print(f"Support Vector Machine training time: {stop - start}s")
         predict = self.svc.predict(x_test)
-        prob = self.regressor.predict_proba(x_test)
-        print(prob)
+        #prob = self.regressor.predict_proba(x_test)
+        #print(prob)
         metrics = self.print_metrics(model, y_test, x_test, predict, "Support Vector Machine", metrics)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
@@ -174,10 +186,13 @@ class Machine_Learn_Static(object):
     # # use k-nearest neighbors
     def k_nearest_neighbors_fit(self, x_train, y_train, x_test, y_test, metrics):
         # Now use k-nearest neighbors to train dataset
+        start = time.time()
         model = self.knn.fit(x_train, y_train)
+        stop = time.time()
+        print(f"K-Nearest Neighbors training time: {stop - start}s")
         predict = self.knn.predict(x_test)
-        prob = self.regressor.predict_proba(x_test)
-        print(prob)
+        #prob = self.regressor.predict_proba(x_test)
+        #print(prob)
         metrics = self.print_metrics(model, y_test, x_test, predict, "K-Nearest Neighbors", metrics)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
@@ -187,10 +202,13 @@ class Machine_Learn_Static(object):
 
     def random_forest_fit(self, x_train, y_train, x_test, y_test, metrics):
         # Now use random forest to train dataset
+        start = time.time()
         model = self.rf.fit(x_train, y_train)
+        stop = time.time()
+        print(f"Random Forest training time: {stop - start}s")
         predict = self.rf.predict(x_test)
-        prob = self.regressor.predict_proba(x_test)
-        print(prob)
+        #prob = self.regressor.predict_proba(x_test)
+        #print(prob)
         metrics = self.print_metrics(model, y_test, x_test, predict, "Random Forest", metrics)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
@@ -204,10 +222,13 @@ class Machine_Learn_Static(object):
     # # use bagging
     def bagging_fit(self, x_train, y_train, x_test, y_test, metrics):
         # Now use bagging to train dataset
+        start = time.time()
         model = self.b.fit(x_train, y_train)
+        stop = time.time()
+        print(f"Bagging training time: {stop - start}s")
         predict = self.b.predict(x_test)
-        prob = self.regressor.predict_proba(x_test)
-        print(prob)
+        #prob = self.regressor.predict_proba(x_test)
+        #print(prob)
         metrics = self.print_metrics(model, y_test, x_test, predict, "Bagging", metrics)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
@@ -218,10 +239,13 @@ class Machine_Learn_Static(object):
     # # use extra tree
     def extra_tree_fit(self, x_train, y_train, x_test, y_test, metrics):
         # Now use extra tree to train dataset
+        start = time.time()
         model = self.et.fit(x_train, y_train)
+        stop = time.time()
+        print(f"Extra Tree training time: {stop - start}s")
         predict = self.et.predict(x_test)
-        prob = self.regressor.predict_proba(x_test)
-        print(prob)
+        #prob = self.regressor.predict_proba(x_test)
+        #print(prob)
         metrics = self.print_metrics(model, y_test, x_test, predict, "Extra Tree", metrics)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
@@ -235,10 +259,13 @@ class Machine_Learn_Static(object):
     # # use ada boost
     def ada_boost_fit(self, x_train, y_train, x_test, y_test, metrics):
         # Now use ada boost to train dataset
+        start = time.time()
         model = self.et.fit(x_train, y_train)
+        stop = time.time()
+        print(f"Ada Boost training time: {stop - start}s")
         predict = self.et.predict(x_test)
-        prob = self.regressor.predict_proba(x_test)
-        print(prob)
+        #prob = self.regressor.predict_proba(x_test)
+        #print(prob)
         metrics = self.print_metrics(model, y_test, x_test, predict, "Ada Boost", metrics)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
@@ -252,10 +279,13 @@ class Machine_Learn_Static(object):
     # # use gradient boosting
     def gradient_boosting_fit(self, x_train, y_train, x_test, y_test, metrics):
         # Now use gradient boosting to train dataset
+        start = time.time()
         model = self.gb.fit(x_train, y_train)
+        stop = time.time()
+        print(f"Gradient Boosting training time: {stop - start}s")
         predict = self.gb.predict(x_test)
-        prob = self.regressor.predict_proba(x_test)
-        print(prob)
+        #prob = self.regressor.predict_proba(x_test)
+        #print(prob)
         metrics = self.print_metrics(model, y_test, x_test, predict, "Gradient Boosting", metrics)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
@@ -266,18 +296,21 @@ class Machine_Learn_Static(object):
         print(feature_importances)
         return metrics
 
-     # # use neural network
+     # # use Multilayer Perceptron
     def neural_network_fit(self, x_train, y_train, x_test, y_test, metrics):
         # Now use gradient boosting to train dataset
+        start = time.time()
         model = self.gb.fit(x_train, y_train)
+        stop = time.time()
+        print(f"Multilayer Perceptron training time: {stop - start}s")
         predict = self.gb.predict(x_test)
         # prob = self.regressor.predict_proba(x_test)
         # print(prob)
-        metrics = self.print_metrics(model, y_test, x_test, predict, "Neural Network", metrics)
+        metrics = self.print_metrics(model, y_test, x_test, predict, "Multilayer Perceptron", metrics)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
         # Plot non-normalized confusion matrix
-        self.plot_confusion_matrix("Neural Network", y_test, predict, classes=class_names)
+        self.plot_confusion_matrix("Multilayer Perceptron", y_test, predict, classes=class_names)
         return metrics
 
     # Auto Keras : https://autokeras.com/temp/supervised/
@@ -344,11 +377,12 @@ class Machine_Learn_Static(object):
         # Add xticks on the middle of the group bars
         # plt.xlabel('Algorithms', fontweight='bold')
         plt.xticks([r + barWidth for r in range(len(accuracy))], metrics["algorithm"], rotation=45, ha="right")
-        plt.title("Metrics for Different Machine Learning Algorithms")
+        plt.title("Metrics for different Machine Learning Algorithms")
         # Create legend and save graphic
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         fig.tight_layout()
         fig.savefig('figures/metrics.png')
+        fig.savefig('figures/metrics.pgf')
 
         fig = plt.figure()
         rmse = metrics["rmse"]
@@ -358,9 +392,10 @@ class Machine_Learn_Static(object):
         # plt.xlabel('Genre', fontsize=5)
         # plt.ylabel('No of Movies', fontsize=5)
         plt.xticks(index, label, rotation=45, ha="right")
-        plt.title('RMSE  for Different Machine Learning Algorithms')
+        plt.title('RMSE  for different Machine Learning Algorithms')
         fig.tight_layout()
         fig.savefig('figures/rmse.png')
+        fig.savefig('figures/rmse.pgf')
 
 
 
@@ -460,6 +495,7 @@ class Machine_Learn_Static(object):
         fig.tight_layout()
 
         fig.savefig("figures/confusion-matrix-" + algorithm + ".png")
+        fig.savefig("figures/confusion-matrix-" + algorithm + ".pgf")
         return ax
 
     def evaluate_CNN_model_talos(self, train_X, train_y, x_val, y_val, params):
@@ -621,7 +657,7 @@ class Machine_Learn_Static(object):
         model.add(Dense(n_outputs, activation='softmax'))
 
         # setting up TensorBoard
-        tensorboard = TensorBoard(log_dir="logs/cnn/{}".format(time()))
+        tensorboard = TensorBoard(log_dir="logs/cnn/{}".format(time.time()))
 
         # optimizer = optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0) # no bueno
         # optimizer = optimizers.Adagrad(lr=0.001, epsilon=None, decay=0.0)
@@ -629,7 +665,7 @@ class Machine_Learn_Static(object):
         # decay = 0.0001/epochs   # lr/epochs    # https://towardsdatascience.com/learning-rate-schedules-and-adaptive-learning-rate-methods-for-deep-learning-2c8f433990d1
         # optimizer = optimizers.SGD(lr=0.0001, momentum=0.8, decay=decay, nesterov=False)
         # optimizer = optimizers.Adam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False) # 0.001 as lr is default
-        optimizer = optimizers.Nadam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=None, schedule_decay=0.004) # 67%
+        optimizer = optimizers.Nadam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, schedule_decay=0.004) # 67%
         model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['acc']) # ,f1_m,precision_m, recall_m
         # model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc']) # ,f1_m,precision_m, recall_m
 
@@ -637,7 +673,10 @@ class Machine_Learn_Static(object):
         es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=5)
 
         # fit network
+        start = time.time()
         history = model.fit(train_X, train_y, epochs=epochs, batch_size=5, verbose=2, shuffle=False, validation_split=0.25, callbacks=[es, tensorboard])
+        stop = time.time()
+        print(f"CNN training time: {stop - start}s")
         print(model.summary())
 
         pyplot.clf()
@@ -730,9 +769,9 @@ class Machine_Learn_Static(object):
         # in the range of 0 and 1 and may be used as predicted probabilities.
 
         # setting up TensorBoard
-        tensorboard = TensorBoard(log_dir="logs/lstm/{}".format(time()))
+        tensorboard = TensorBoard(log_dir="logs/lstm/{}".format(time.time()))
 
-        optimizer = optimizers.Nadam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=None, schedule_decay=0.004)
+        optimizer = optimizers.Nadam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, schedule_decay=0.004)
         model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['acc']) # ,f1_m,precision_m, recall_m
 
         # early stopping
@@ -741,7 +780,10 @@ class Machine_Learn_Static(object):
 
 
         # fit network
+        start  = time.time()
         history = model.fit(train_X, train_y, epochs=50, batch_size=4, verbose=2, shuffle=False, validation_split=0.2, callbacks=[es, tensorboard])
+        stop = time.time()
+        print(f"LSTM training time: {stop - start}s")
         print(model.summary())
 
 
@@ -807,7 +849,7 @@ class Machine_Learn_Static(object):
 
 
     # summarize scores
-    def summarize_results(self, accuracies, losses, recalls, precisions, f1s, mccs, rmses):
+    def summarize_results(self, accuracies, losses, recalls, precisions, f1s, mccs, rmses, algorithm, metrics):
         print(accuracies)
         print(losses)
         a_m, a_s = mean(accuracies), std(accuracies)
@@ -824,6 +866,10 @@ class Machine_Learn_Static(object):
         print('F1: %.3f%% (+/-%.3f)' % (f_m, f_s))
         print('MCC: %.3f%% (+/-%.3f)' % (m_m, m_s))
         print('RMSE: %.3f%% (+/-%.3f)' % (rm_m, rm_s))
+        metric = pd.DataFrame({"algorithm": [algorithm], "accuracy": [a_m], "recall": [r_m],
+                               "precision": [p_m], "f1": [f_m], "mcc": [m_m], "rmse": [rm_m]})
+        metrics = metrics.append(metric)
+        return metrics
 
 
 def HAR_classification():
@@ -929,7 +975,7 @@ def HAR_classification():
     # gradient boosting
     metrics = classification.gradient_boosting_fit(x_train, y_train, x_test, y_test, metrics)
 
-    # neural network
+    # Multilayer Perceptron
     metrics = classification.neural_network_fit(x_train, y_train, x_test, y_test, metrics)
 
 
@@ -995,7 +1041,24 @@ def HAR_classification():
         precisions.append(precision)
         f1s.append(f1)
         mccs.append(mcc)
-    classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses)
+    metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, "CNN", metrics)
+
+    for r in range(repeats):
+        loss, accuracy, rmse, recall, precision, f1, mcc = classification.evaluate_LSTM_model(train_X, train_Y, test_X, test_Y) # run LSTM
+        #loss, accuracy, rmse, recall, precision, f1, mcc = classification.evaluate_CNN_model(train_X, train_Y, test_X, test_Y) # run CNN
+        #loss, accuracy, rmse, recall, precision, f1, mcc = classification.evaluate_CNN_LSTM_model(train_X, train_Y, test_X, test_Y) # run CNN with LSTM layers
+        accuracy = accuracy * 100.0
+        print('>#%d: %.3f' % (r+1, accuracy))
+        accuracies.append(accuracy)
+        losses.append(loss)
+        rmses.append(rmse)
+        recalls.append(recall)
+        precisions.append(precision)
+        f1s.append(f1)
+        mccs.append(mcc)
+    metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, "LSTM", metrics)
+
+    classification.plot_metrics(metrics)
 
 
 if __name__ == '__main__':
