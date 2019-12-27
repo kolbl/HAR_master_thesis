@@ -981,7 +981,6 @@ def HAR_classification():
 
     print("Summary of results:")
     print(metrics)
-    classification.plot_metrics(metrics)
 
 
 
