@@ -85,6 +85,8 @@ from keras.callbacks import TensorBoard
 import tikzplotlib
 import matplotlib
 from matplotlib.backends.backend_pgf import FigureCanvasPgf
+import itertools
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 class Machine_Learn_Static(object):
@@ -113,13 +115,14 @@ class Machine_Learn_Static(object):
         start = time.time()
         model = self.regressor.fit(x_train, y_train)
         stop = time.time()
+        training_time = stop - start
         print(f"Logistic Regression training time: {stop - start}s")
         predict = self.regressor.predict(x_test)
         prob = self.regressor.predict_proba(x_test)
         # print(prob)
         # proba = pd.DataFrame(prob)
         # proba.to_csv("probabilities.csv", sep=';', encoding='utf-8', index=False)
-        metrics = self.print_metrics(model, y_test, x_test, predict, "Logistic Regression", metrics)
+        metrics = self.print_metrics(model, y_test, x_test, predict, "Logistic Regression", metrics, training_time)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
         # Plot non-normalized confusion matrix
@@ -127,6 +130,7 @@ class Machine_Learn_Static(object):
         # print("predicted: ")
         # print(predict)
         self.plot_confusion_matrix("Logistic Regression", y_test, predict, classes=class_names)
+
         return metrics
 
     # # use sklearn naive bayes / example program
@@ -135,11 +139,12 @@ class Machine_Learn_Static(object):
         start = time.time()
         model = self.gnb.fit(x_train, y_train)
         stop = time.time()
+        training_time = stop - start
         print(f"Naive Bayes training time: {stop - start}s")
         predict = self.gnb.predict(x_test)
         # prob = self.regressor.predict_proba(x_test)
         # print(prob)
-        metrics = self.print_metrics(model, y_test, x_test, predict, "Naive Bayes", metrics)
+        metrics = self.print_metrics(model, y_test, x_test, predict, "Naive Bayes", metrics, training_time)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
         # Plot non-normalized confusion matrix
@@ -152,11 +157,12 @@ class Machine_Learn_Static(object):
         start = time.time()
         model = self.dt.fit(x_train, y_train)
         stop = time.time()
+        training_time = stop - start
         print(f"Decision tree training time: {stop - start}s")
         predict = self.dt.predict(x_test)
         #prob = self.regressor.predict_proba(x_test)
         #print(prob)
-        metrics = self.print_metrics(model, y_test, x_test, predict, "Decision Tree", metrics)
+        metrics = self.print_metrics(model, y_test, x_test, predict, "Decision Tree", metrics, training_time)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
         # Plot non-normalized confusion matrix
@@ -172,11 +178,12 @@ class Machine_Learn_Static(object):
         start = time.time()
         model = self.svc.fit(x_train, y_train)
         stop = time.time()
+        training_time = stop - start
         print(f"Support Vector Machine training time: {stop - start}s")
         predict = self.svc.predict(x_test)
         #prob = self.regressor.predict_proba(x_test)
         #print(prob)
-        metrics = self.print_metrics(model, y_test, x_test, predict, "Support Vector Machine", metrics)
+        metrics = self.print_metrics(model, y_test, x_test, predict, "Support Vector Machine", metrics, training_time)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
         # Plot non-normalized confusion matrix
@@ -189,11 +196,12 @@ class Machine_Learn_Static(object):
         start = time.time()
         model = self.knn.fit(x_train, y_train)
         stop = time.time()
+        training_time = stop - start
         print(f"K-Nearest Neighbors training time: {stop - start}s")
         predict = self.knn.predict(x_test)
         #prob = self.regressor.predict_proba(x_test)
         #print(prob)
-        metrics = self.print_metrics(model, y_test, x_test, predict, "K-Nearest Neighbors", metrics)
+        metrics = self.print_metrics(model, y_test, x_test, predict, "K-Nearest Neighbors", metrics, training_time)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
         # Plot non-normalized confusion matrix
@@ -205,11 +213,12 @@ class Machine_Learn_Static(object):
         start = time.time()
         model = self.rf.fit(x_train, y_train)
         stop = time.time()
+        training_time = stop - start
         print(f"Random Forest training time: {stop - start}s")
         predict = self.rf.predict(x_test)
         #prob = self.regressor.predict_proba(x_test)
         #print(prob)
-        metrics = self.print_metrics(model, y_test, x_test, predict, "Random Forest", metrics)
+        metrics = self.print_metrics(model, y_test, x_test, predict, "Random Forest", metrics, training_time)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
         # Plot non-normalized confusion matrix
@@ -225,11 +234,12 @@ class Machine_Learn_Static(object):
         start = time.time()
         model = self.b.fit(x_train, y_train)
         stop = time.time()
+        training_time = stop - start
         print(f"Bagging training time: {stop - start}s")
         predict = self.b.predict(x_test)
         #prob = self.regressor.predict_proba(x_test)
         #print(prob)
-        metrics = self.print_metrics(model, y_test, x_test, predict, "Bagging", metrics)
+        metrics = self.print_metrics(model, y_test, x_test, predict, "Bagging", metrics, training_time)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
         # Plot non-normalized confusion matrix
@@ -242,11 +252,12 @@ class Machine_Learn_Static(object):
         start = time.time()
         model = self.et.fit(x_train, y_train)
         stop = time.time()
+        training_time = stop - start
         print(f"Extra Tree training time: {stop - start}s")
         predict = self.et.predict(x_test)
         #prob = self.regressor.predict_proba(x_test)
         #print(prob)
-        metrics = self.print_metrics(model, y_test, x_test, predict, "Extra Tree", metrics)
+        metrics = self.print_metrics(model, y_test, x_test, predict, "Extra Tree", metrics, training_time)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
         # Plot non-normalized confusion matrix
@@ -262,11 +273,12 @@ class Machine_Learn_Static(object):
         start = time.time()
         model = self.et.fit(x_train, y_train)
         stop = time.time()
+        training_time = stop - start
         print(f"Ada Boost training time: {stop - start}s")
         predict = self.et.predict(x_test)
         #prob = self.regressor.predict_proba(x_test)
         #print(prob)
-        metrics = self.print_metrics(model, y_test, x_test, predict, "Ada Boost", metrics)
+        metrics = self.print_metrics(model, y_test, x_test, predict, "Ada Boost", metrics, training_time)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
         # Plot non-normalized confusion matrix
@@ -282,11 +294,12 @@ class Machine_Learn_Static(object):
         start = time.time()
         model = self.gb.fit(x_train, y_train)
         stop = time.time()
+        training_time = stop - start
         print(f"Gradient Boosting training time: {stop - start}s")
         predict = self.gb.predict(x_test)
         #prob = self.regressor.predict_proba(x_test)
         #print(prob)
-        metrics = self.print_metrics(model, y_test, x_test, predict, "Gradient Boosting", metrics)
+        metrics = self.print_metrics(model, y_test, x_test, predict, "Gradient Boosting", metrics, training_time)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
         # Plot non-normalized confusion matrix
@@ -302,11 +315,12 @@ class Machine_Learn_Static(object):
         start = time.time()
         model = self.gb.fit(x_train, y_train)
         stop = time.time()
+        training_time = stop - start
         print(f"Multilayer Perceptron training time: {stop - start}s")
         predict = self.gb.predict(x_test)
         # prob = self.regressor.predict_proba(x_test)
         # print(prob)
-        metrics = self.print_metrics(model, y_test, x_test, predict, "Multilayer Perceptron", metrics)
+        metrics = self.print_metrics(model, y_test, x_test, predict, "Multilayer Perceptron", metrics, training_time)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
         # Plot non-normalized confusion matrix
@@ -328,7 +342,7 @@ class Machine_Learn_Static(object):
 
 
     # print metrics
-    def print_metrics(self, model, y_test, x_test, y_pred, algorithm, metrics):
+    def print_metrics(self, model, y_test, x_test, y_pred, algorithm, metrics, training_time):
         # training accuracy
         training_accuracy = round(model.score(x_test, y_test), 2)
         print(algorithm, ": training accuracy is: ", training_accuracy)
@@ -343,13 +357,17 @@ class Machine_Learn_Static(object):
         print(algorithm, ": testing accuracy is: ", accuracy, ", recall (weighted) is: ", recall,
               "precision (weighted) is: ", precision, "F1 (weighted) is: ", f1, "MCC is:", mcc, "RMSE is:", rmse)
         metric = pd.DataFrame({"algorithm": [algorithm], "accuracy": [accuracy], "recall": [recall],
-                               "precision": [precision], "f1": [f1], "mcc": [mcc], "rmse": [rmse]})
+                               "precision": [precision], "f1": [f1], "mcc": [mcc], "rmse": [rmse], "trainingtime" : [training_time]})
         metrics = metrics.append(metric)
         print("-------------------------------------------------------------------------------------------------------")
         return metrics
 
+
     # plot metrics
     def plot_metrics(self, metrics):
+        f = plt.figure()
+        f.clear()
+        plt.close(f)
         # print testing accuracy, precision and recall for each activity as bar chart
         fig = plt.figure()
         # set width of bar
@@ -381,8 +399,12 @@ class Machine_Learn_Static(object):
         # Create legend and save graphic
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         fig.tight_layout()
-        fig.savefig('figures/metrics.png')
-        fig.savefig('figures/metrics.pgf')
+        fig.savefig('figures/metrics.png', dpi=300)
+        fig.savefig('figures/metrics.pgf', dpi=300)
+
+        f = plt.figure()
+        f.clear()
+        plt.close(f)
 
         fig = plt.figure()
         rmse = metrics["rmse"]
@@ -390,12 +412,46 @@ class Machine_Learn_Static(object):
         index = np.arange(len(label))
         plt.bar(index, rmse)
         # plt.xlabel('Genre', fontsize=5)
-        # plt.ylabel('No of Movies', fontsize=5)
+        plt.ylabel('RMSE')
         plt.xticks(index, label, rotation=45, ha="right")
-        plt.title('RMSE  for different Machine Learning Algorithms')
+        plt.title('RMSE for different Machine Learning Algorithms')
         fig.tight_layout()
-        fig.savefig('figures/rmse.png')
-        fig.savefig('figures/rmse.pgf')
+        fig.savefig('figures/rmse.png', dpi=300)
+        fig.savefig('figures/rmse.pgf', dpi=300)
+
+        f = plt.figure()
+        f.clear()
+        plt.close(f)
+
+        fig = plt.figure()
+        loss = metrics["loss"]
+        label = metrics["algorithm"]
+        index = np.arange(len(label))
+        plt.bar(index, loss)
+        # plt.xlabel('Genre', fontsize=5)
+        plt.ylabel('Loss')
+        plt.xticks(index, label, rotation=45, ha="right")
+        plt.title('Loss for different Machine Learning Algorithms')
+        fig.tight_layout()
+        fig.savefig('figures/loss.png', dpi=300)
+        fig.savefig('figures/loss.pgf', dpi=300)
+
+        f = plt.figure()
+        f.clear()
+        plt.close(f)
+
+        fig = plt.figure()
+        training_time = metrics["trainingtime"]
+        label = metrics["algorithm"]
+        index = np.arange(len(label))
+        plt.bar(index, loss)
+        # plt.xlabel('Genre', fontsize=5)
+        plt.ylabel('Training Time')
+        plt.xticks(index, label, rotation=45, ha="right")
+        plt.title('Training Time for different Machine Learning Algorithms')
+        fig.tight_layout()
+        fig.savefig('figures/training-time.png', dpi=300)
+        fig.savefig('figures/training-time.pgf', dpi=300)
 
 
 
@@ -440,6 +496,10 @@ class Machine_Learn_Static(object):
         #    This function prints and plots the confusion matrix.
 
 
+        f = plt.figure()
+        f.clear()
+        plt.close(f)
+
         np.set_printoptions(precision=2)
         y_true = y_true.astype(int)
         y_pred = y_pred.astype(int)
@@ -452,13 +512,13 @@ class Machine_Learn_Static(object):
         # Only use the labels that appear in the data
 
         # when using "no activity" as addictional class
-        # classes_new = pd.DataFrame(classes[unique_labels(y_true, y_pred)], columns=["ACTIVITY"])
+        #classes_new = pd.DataFrame(classes[unique_labels(y_true, y_pred)], columns=["ACTIVITY"])
         classes_new = pd.DataFrame(classes[unique_labels(y_true, y_pred) - 1], columns=["ACTIVITY"])
 
-        activity_map = {1: "Act01", 2: "Act02", 3: "Act03", 4: "Act04", 5: "Act05", 6: "Act06", 7: "Act07", 8: "Act08",
+        activity_map = {0: "no activity", 1: "Act01", 2: "Act02", 3: "Act03", 4: "Act04", 5: "Act05", 6: "Act06", 7: "Act07", 8: "Act08",
                         9: "Act09",  10: "Act10", 11: "Act11", 12: "Act12", 13: "Act13", 14: "Act14",  15: "Act15",
                         16: "Act16", 17: "Act17", 18: "Act18", 19: "Act19", 20: "Act20", 21: "Act21", 22: "Act22",
-                        23: "Act23", 24: "Act24", 0: "no activity"}
+                        23: "Act23", 24: "Act24"}
         classes_new["ACTIVITY"] = classes_new["ACTIVITY"].map(activity_map)
         activities = pd.read_csv("activities.csv", delimiter=",")
         activities = activities.append(pd.DataFrame({"ACTIVITY": ["no activity"], "Activity Name": ["no activity"]}))
@@ -470,16 +530,32 @@ class Machine_Learn_Static(object):
 
         fig, ax = plt.subplots(figsize=(15, 15))
         im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
-        ax.figure.colorbar(im, ax=ax)
+
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        plt.colorbar(im, cax=cax)
+
+        #ax.figure.colorbar(im, ax=ax)
+
+        accuracy = np.trace(cm) / np.sum(cm).astype('float')
+        misclass = 1 - accuracy
         # We want to show all ticks...
         ax.set(xticks=np.arange(cm.shape[1]),
                yticks=np.arange(cm.shape[0]),
                # ... and label them with the respective list entries
-               xticklabels=labels, yticklabels=labels,
+               xticklabels=labels,
+               yticklabels=labels,
                title=title,
                ylabel='True label',
-               xlabel='Predicted label')
-        ax.title.set_fontsize(16)
+               xlabel='Predicted label\naccuracy={:0.2f}%; misclassified={:0.2f}%'.format(accuracy*100.0, misclass*100.0))
+
+        ax.xaxis.label.set_size(20)
+        ax.yaxis.label.set_size(20)
+
+        bottom, top = ax.get_ylim()
+        ax.set_ylim(bottom + 0.5, top - 0.5)
+
+        ax.title.set_fontsize(20)
         # Rotate the tick labels and set their alignment.
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
                  rotation_mode="anchor")
@@ -493,9 +569,13 @@ class Machine_Learn_Static(object):
                         ha="center", va="center",
                         color="white" if cm[i, j] > thresh else "black")
         fig.tight_layout()
+        fig.savefig("figures/confusion-matrix-" + algorithm + ".pgf", dpi=300)
+        fig.savefig("figures/confusion-matrix-" + algorithm + ".png", dpi=300)
 
-        fig.savefig("figures/confusion-matrix-" + algorithm + ".png")
-        fig.savefig("figures/confusion-matrix-" + algorithm + ".pgf")
+        fig.clear()
+        plt.close(fig)
+
+
         return ax
 
     def evaluate_CNN_model_talos(self, train_X, train_y, x_val, y_val, params):
@@ -541,7 +621,7 @@ class Machine_Learn_Static(object):
         model.add(Dense(n_outputs, activation='softmax'))
 
         # setting up TensorBoard
-        tensorboard = TensorBoard(log_dir="logs/cnn-lstm/{}".format(time()))
+        tensorboard = TensorBoard(log_dir="logs/cnn-lstm/{}".format(time.time()))
 
         optimizer = optimizers.Nadam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=None, schedule_decay=0.004)
         model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['acc'])
@@ -676,6 +756,7 @@ class Machine_Learn_Static(object):
         start = time.time()
         history = model.fit(train_X, train_y, epochs=epochs, batch_size=5, verbose=2, shuffle=False, validation_split=0.25, callbacks=[es, tensorboard])
         stop = time.time()
+        training_time = stop - start
         print(f"CNN training time: {stop - start}s")
         print(model.summary())
 
@@ -688,11 +769,22 @@ class Machine_Learn_Static(object):
         pyplot.xlabel('epoch')
         pyplot.legend(['train', 'validation', 'accuracy'], loc='upper right')
         # pyplot.show()
+        pyplot.savefig('figures/CNN-result-plot.pgf', dpi=300)
+        pyplot.savefig('figures/CNN-result-plot.png', dpi=300)
+
 
         # plot metrics
-        #pyplot.clf()
-        #pyplot.plot(history.history['acc'])
+        pyplot.clf()
+        pyplot.plot(history.history['acc'])
+        pyplot.savefig('figures/CNN-history.png', dpi=300)
+        pyplot.savefig('figures/CNN-history.pgf', dpi=300)
         #pyplot.show()
+
+        print("CNN history:")
+        print(history.history['loss'])
+        print(history.history['acc'])
+        print(history.history['val_loss'])
+        print(history.history['val_acc'])
 
 
         #print("metrics are ", model.metrics_names)
@@ -739,7 +831,13 @@ class Machine_Learn_Static(object):
 
         print("classification report:")
         print(classification_report(ground_truth, predictions))
-        return loss, accuracy, rmse, recall, precision, f1, mcc
+
+        f = plt.figure()
+        f.clear()
+        plt.close(f)
+
+
+        return loss, accuracy, rmse, recall, precision, f1, mcc, training_time
 
 
     # fit and evaluate a LSTM model
@@ -783,6 +881,7 @@ class Machine_Learn_Static(object):
         start  = time.time()
         history = model.fit(train_X, train_y, epochs=50, batch_size=4, verbose=2, shuffle=False, validation_split=0.2, callbacks=[es, tensorboard])
         stop = time.time()
+        training_time = stop - start
         print(f"LSTM training time: {stop - start}s")
         print(model.summary())
 
@@ -796,7 +895,18 @@ class Machine_Learn_Static(object):
         pyplot.xlabel('epoch')
         pyplot.legend(['train', 'validation', 'accuracy'], loc='upper right')
         # pyplot.show()
+        pyplot.savefig('figures/LSTM-result-plot.png', dpi=300)
+        pyplot.savefig('figures/LSTM-result-plot.pgf', dpi=300)
 
+
+        # plot metrics
+        pyplot.clf()
+        pyplot.plot(history.history['acc'])
+        pyplot.savefig('figures/LSTM-history.png', dpi=300)
+        pyplot.savefig('figures/LSTM-history.pgf', dpi=300)
+        #pyplot.show()
+
+        print("LSTM history:")
         print(history.history['loss'])
         print(history.history['acc'])
         print(history.history['val_loss'])
@@ -844,12 +954,17 @@ class Machine_Learn_Static(object):
 
         print("classification report:")
         print(classification_report(ground_truth, predictions))
-        return loss, accuracy, rmse, recall, precision, f1, mcc
+
+        f = plt.figure()
+        f.clear()
+        plt.close(f)
+
+        return loss, accuracy, rmse, recall, precision, f1, mcc, training_time
 
 
 
     # summarize scores
-    def summarize_results(self, accuracies, losses, recalls, precisions, f1s, mccs, rmses, algorithm, metrics):
+    def summarize_results(self, accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, algorithm, metrics):
         print(accuracies)
         print(losses)
         a_m, a_s = mean(accuracies), std(accuracies)
@@ -859,6 +974,8 @@ class Machine_Learn_Static(object):
         f_m, f_s = mean(f1s), std(f1s)
         m_m, m_s = mean(mccs), std(mccs)
         rm_m, rm_s = mean(rmses), std(rmses)
+        tt_m, tt_s = mean(training_times), std(training_times)
+
         print('Accuracy: %.3f%% (+/-%.3f)' % (a_m, a_s))
         print('Loss: %.3f%% (+/-%.3f)' % (l_m, l_s))
         print('Recall: %.3f%% (+/-%.3f)' % (r_m, r_s))
@@ -867,7 +984,7 @@ class Machine_Learn_Static(object):
         print('MCC: %.3f%% (+/-%.3f)' % (m_m, m_s))
         print('RMSE: %.3f%% (+/-%.3f)' % (rm_m, rm_s))
         metric = pd.DataFrame({"algorithm": [algorithm], "accuracy": [a_m], "recall": [r_m],
-                               "precision": [p_m], "f1": [f_m], "mcc": [m_m], "rmse": [rm_m]})
+                               "precision": [p_m], "f1": [f_m], "mcc": [m_m], "rmse": [rm_m], "trainingtime" : [tt_m]})
         metrics = metrics.append(metric)
         return metrics
 
@@ -946,7 +1063,7 @@ def HAR_classification():
 
 
     # run machine learning algorithms - uncomment this if you want to run
-    metrics = pd.DataFrame(columns=["algorithm", "accuracy", "recall", "precision", "f1", "mcc", "rmse"])
+    metrics = pd.DataFrame(columns=["algorithm", "accuracy", "recall", "precision", "f1", "mcc", "rmse", "trainingtime"])
 
     # Logistic Regression
     metrics = classification.logic_regress_fit(x_train, y_train, x_test, y_test, metrics)
@@ -1026,13 +1143,14 @@ def HAR_classification():
     f1s = list()
     mccs = list()
     rmses = list()
+    training_times = list()
 
     for r in range(repeats):
-        # loss, accuracy, rmse, recall, precision, f1, mcc = classification.evaluate_LSTM_model(train_X, train_Y, test_X, test_Y) # run LSTM
-        loss, accuracy, rmse, recall, precision, f1, mcc = classification.evaluate_CNN_model(train_X, train_Y, test_X, test_Y) # run CNN
+        loss, accuracy, rmse, recall, precision, f1, mcc, training_time = classification.evaluate_CNN_model(train_X, train_Y, test_X, test_Y) # run CNN
         # loss, accuracy, rmse, recall, precision, f1, mcc = classification.evaluate_CNN_LSTM_model(train_X, train_Y, test_X, test_Y) # run CNN with LSTM layers
         accuracy = accuracy * 100.0
         print('>#%d: %.3f' % (r+1, accuracy))
+        accuracy = accuracy / 100.0
         accuracies.append(accuracy)
         losses.append(loss)
         rmses.append(rmse)
@@ -1040,14 +1158,15 @@ def HAR_classification():
         precisions.append(precision)
         f1s.append(f1)
         mccs.append(mcc)
-    metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, "CNN", metrics)
+        training_times.append(training_time)
+    metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "CNN", metrics)
 
     for r in range(repeats):
-        loss, accuracy, rmse, recall, precision, f1, mcc = classification.evaluate_LSTM_model(train_X, train_Y, test_X, test_Y) # run LSTM
-        #loss, accuracy, rmse, recall, precision, f1, mcc = classification.evaluate_CNN_model(train_X, train_Y, test_X, test_Y) # run CNN
+        loss, accuracy, rmse, recall, precision, f1, mcc, training_time = classification.evaluate_LSTM_model(train_X, train_Y, test_X, test_Y) # run LSTM
         #loss, accuracy, rmse, recall, precision, f1, mcc = classification.evaluate_CNN_LSTM_model(train_X, train_Y, test_X, test_Y) # run CNN with LSTM layers
         accuracy = accuracy * 100.0
         print('>#%d: %.3f' % (r+1, accuracy))
+        accuracy = accuracy / 100.0
         accuracies.append(accuracy)
         losses.append(loss)
         rmses.append(rmse)
@@ -1055,9 +1174,13 @@ def HAR_classification():
         precisions.append(precision)
         f1s.append(f1)
         mccs.append(mcc)
-    metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, "LSTM", metrics)
+        training_times.append(training_time)
+    metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "LSTM", metrics)
 
     classification.plot_metrics(metrics)
+    print("#################### end ###################")
+    print("Summary of results:")
+    print(metrics)
 
 
 if __name__ == '__main__':
