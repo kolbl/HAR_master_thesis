@@ -87,6 +87,7 @@ import matplotlib
 from matplotlib.backends.backend_pgf import FigureCanvasPgf
 import itertools
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from sklearn.metrics import log_loss
 
 
 class Machine_Learn_Static(object):
@@ -94,7 +95,7 @@ class Machine_Learn_Static(object):
         self.regressor = LogisticRegression(random_state=0, solver='lbfgs', multi_class='multinomial', max_iter=5000)   # build the linear regression model
         self.gnb = GaussianNB()  # using sklearn gaussian naive bayes
         self.dt = tree.DecisionTreeClassifier()  # using sklearn decision tree
-        self.svc = SVC(C=1.0, decision_function_shape='ovr', degree=3, gamma='auto_deprecated', kernel='rbf')
+        self.svc = SVC(C=1.0, decision_function_shape='ovr', degree=3, gamma='auto_deprecated', kernel='rbf', probability=True)
         self.knn = KNeighborsClassifier(n_neighbors=5)  # using sklearn k-nearest neighbors
         self.rf = RandomForestClassifier(n_estimators=1000, max_depth=10, random_state=0)   # using sklearn random forest
         self.b = BaggingClassifier()   # using sklearn bagging classification
@@ -340,7 +341,6 @@ class Machine_Learn_Static(object):
         print("Auto Keras accuracy: ", y)
 
 
-
     # print metrics
     def print_metrics(self, model, y_test, x_test, y_pred, algorithm, metrics, training_time):
         # training accuracy
@@ -353,11 +353,20 @@ class Machine_Learn_Static(object):
         f1 = round(f1_score(y_test, y_pred, average="weighted", labels=np.unique(y_pred)), 4)
         mcc = round(matthews_corrcoef(y_test, y_pred), 4)
         rmse = round(sqrt(mean_squared_error(y_test, y_pred)), 4)  # Mean squared error regression loss
+
+        # log-loss: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.log_loss.html
+        probs = model.predict_proba(x_test)
+        labels = [1,  2,  3,  4,  5,  6,  7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+
+        loss = log_loss(y_test, probs, labels=labels)
+        loss = round(loss, 4)
+
         print("Missing classes in prediction: ", set(y_test) - set(y_pred))
         print(algorithm, ": testing accuracy is: ", accuracy, ", recall (weighted) is: ", recall,
               "precision (weighted) is: ", precision, "F1 (weighted) is: ", f1, "MCC is:", mcc, "RMSE is:", rmse)
         metric = pd.DataFrame({"algorithm": [algorithm], "accuracy": [accuracy], "recall": [recall],
-                               "precision": [precision], "f1": [f1], "mcc": [mcc], "rmse": [rmse], "trainingtime" : [training_time]})
+                               "precision": [precision], "f1": [f1], "mcc": [mcc], "rmse": [rmse],
+                               "trainingtime" : [training_time], "loss": [loss]})
         metrics = metrics.append(metric)
         print("-------------------------------------------------------------------------------------------------------")
         return metrics
@@ -1063,7 +1072,7 @@ def HAR_classification():
 
 
     # run machine learning algorithms - uncomment this if you want to run
-    metrics = pd.DataFrame(columns=["algorithm", "accuracy", "recall", "precision", "f1", "mcc", "rmse", "trainingtime"])
+    metrics = pd.DataFrame(columns=["algorithm", "accuracy", "recall", "precision", "f1", "mcc", "rmse", "trainingtime", "loss"])
 
     # Logistic Regression
     metrics = classification.logic_regress_fit(x_train, y_train, x_test, y_test, metrics)
