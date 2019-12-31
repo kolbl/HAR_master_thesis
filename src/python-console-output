@@ -1,0 +1,26 @@
+Running ML algorithms with the following parameters:
+Lags (time steps): 40
+Features: 3403
+Training samples: 5322
+Testing samples: 2898
+Logistic Regression training time: 94.92547249794006s
+Logistic Regression : training accuracy is:  0.66
+Missing classes in prediction:  {19.0, 14.0}
+Logistic Regression : testing accuracy is:  0.6563 , recall (weighted) is:  0.6702 precision (weighted) is:  0.7144 F1 (weighted) is:  0.6311 MCC is: 0.6448 RMSE is: 3.987
+-------------------------------------------------------------------------------------------------------
+Accuracies per class for Logistic Regression
+[0.89 0.97 0.81 0.98 0.77 0.83 0.94 0.88 0.77 0.   0.25 0.31 0.   0.76
+ 0.8  0.81 0.06 0.    nan 0.94 0.76 0.43 0.87]
+Naive Bayes training time: 0.46534204483032227s
+Naive Bayes : training accuracy is:  0.34
+Missing classes in prediction:  {19.0, 12.0, 14.0}
+Naive Bayes : testing accuracy is:  0.3354 , recall (weighted) is:  0.4333 precision (weighted) is:  0.5575 F1 (weighted) is:  0.3964 MCC is: 0.3213 RMSE is: 6.4822
+-------------------------------------------------------------------------------------------------------
+Accuracies per class for Naive Bayes
+[0.32 0.87 0.46 0.58 0.4  0.54 0.1   nan 0.   0.46 0.   0.   0.12 0.
+ 0.69 0.27 0.79 0.36 0.    nan 0.28 0.83 0.29 0.8 ]
+Decision tree training time: 3.027233362197876s
+Decision Tree : training accuracy is:  0.42
+Missing classes in prediction:  set()
+Decision Tree : testing accuracy is:  0.4224 , recall (weighted) is:  0.4224 precision (weighted) is:  0.4866 F1 (weighted) is:  0.3875 MCC is: 0.3952 RMSE is: 6.9995
+-------------------------------------------------------------------------------------------------------

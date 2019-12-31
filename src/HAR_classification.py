@@ -88,6 +88,7 @@ from matplotlib.backends.backend_pgf import FigureCanvasPgf
 import itertools
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from sklearn.metrics import log_loss
+import sys
 
 
 class Machine_Learn_Static(object):
@@ -440,7 +441,7 @@ class Machine_Learn_Static(object):
         # plt.xlabel('Genre', fontsize=5)
         plt.ylabel('Loss')
         plt.xticks(index, label, rotation=45, ha="right")
-        plt.title('Loss for different Machine Learning Algorithms')
+        plt.title('Categorical Cross-Entropy Loss for different Machine Learning Algorithms')
         fig.tight_layout()
         fig.savefig('figures/loss.png', dpi=300)
         fig.savefig('figures/loss.pgf', dpi=300)
@@ -453,9 +454,9 @@ class Machine_Learn_Static(object):
         training_time = metrics["trainingtime"]
         label = metrics["algorithm"]
         index = np.arange(len(label))
-        plt.bar(index, loss)
+        plt.bar(index, training_time)
         # plt.xlabel('Genre', fontsize=5)
-        plt.ylabel('Training Time')
+        plt.ylabel('Training Time in seconds')
         plt.xticks(index, label, rotation=45, ha="right")
         plt.title('Training Time for different Machine Learning Algorithms')
         fig.tight_layout()
@@ -585,6 +586,15 @@ class Machine_Learn_Static(object):
         plt.close(fig)
 
 
+        # get accuracies per class
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        accuracies = cm.diagonal()
+        print("Accuracies per class for {}".format(algorithm))
+        print(accuracies)
+
+
+
+
         return ax
 
     def evaluate_CNN_model_talos(self, train_X, train_y, x_val, y_val, params):
@@ -619,7 +629,7 @@ class Machine_Learn_Static(object):
         # https://towardsdatascience.com/get-started-with-using-cnn-lstm-for-forecasting-6f0f4dde5826
         # define model
         model = Sequential()
-        model.add(TimeDistributed(Conv1D(filters=64, kernel_size=2, activation='relu'), input_shape=(None, 32, 83))) # input_shape=(None,32,83)))
+        model.add(TimeDistributed(Conv1D(filters=64, kernel_size=2, activation='relu'), input_shape=(1, 41, 83))) # input_shape=(None,32,83)))
         # model.add(TimeDistributed(Conv1D(filters=64, kernel_size=3, activation='relu')))
         model.add(TimeDistributed(Dropout(0.8)))
         model.add(TimeDistributed(MaxPooling1D(pool_size=2)))
@@ -632,13 +642,17 @@ class Machine_Learn_Static(object):
         # setting up TensorBoard
         tensorboard = TensorBoard(log_dir="logs/cnn-lstm/{}".format(time.time()))
 
-        optimizer = optimizers.Nadam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=None, schedule_decay=0.004)
+        ptimizer = optimizers.Nadam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, schedule_decay=0.004)
+
         model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['acc'])
         # early stopping
         es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=5)
 
         # fit network
+        start = time.time()
         history = model.fit(train_X, train_y, epochs=50, batch_size=5, verbose=2, shuffle=False, validation_split=0.2, callbacks=[es, tensorboard])
+        stop = time.time()
+        training_time = stop - start
         print(model.summary())
 
         pyplot.clf()
@@ -693,13 +707,25 @@ class Machine_Learn_Static(object):
         print("f1", f1)
         print("mcc", mcc)
 
+        pyplot.clf()
+        pyplot.plot(history.history['loss'])
+        pyplot.plot(history.history['val_loss'])
+        pyplot.plot(history.history['acc'])
+        pyplot.title('CNN with LSTM Layers: model train vs validation loss and accuracy')
+        pyplot.ylabel('loss')
+        pyplot.xlabel('epoch')
+        pyplot.legend(['train', 'validation', 'accuracy'], loc='upper right')
+        # pyplot.show()
+        pyplot.savefig('figures/CNN-LSTM-result-plot.pgf', dpi=300)
+        pyplot.savefig('figures/CNN-LSTM-result-plot.png', dpi=300)
+
         rmse = sqrt(mean_squared_error(ground_truth, predictions))
         print('RMSE: %.3f' % rmse)
 
 
         print("classification report:")
         print(classification_report(ground_truth, predictions))
-        return loss, accuracy, rmse, recall, precision, f1, mcc
+        return loss, accuracy, rmse, recall, precision, f1, mcc, training_time
 
 
 
@@ -846,7 +872,7 @@ class Machine_Learn_Static(object):
         plt.close(f)
 
 
-        return loss, accuracy, rmse, recall, precision, f1, mcc, training_time
+        return loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model
 
 
     # fit and evaluate a LSTM model
@@ -974,8 +1000,6 @@ class Machine_Learn_Static(object):
 
     # summarize scores
     def summarize_results(self, accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, algorithm, metrics):
-        print(accuracies)
-        print(losses)
         a_m, a_s = mean(accuracies), std(accuracies)
         l_m, l_s = mean(losses), std(losses)
         r_m, r_s = mean(recalls), std(recalls)
@@ -985,6 +1009,8 @@ class Machine_Learn_Static(object):
         rm_m, rm_s = mean(rmses), std(rmses)
         tt_m, tt_s = mean(training_times), std(training_times)
 
+        print("Output from summarize_results:")
+
         print('Accuracy: %.3f%% (+/-%.3f)' % (a_m, a_s))
         print('Loss: %.3f%% (+/-%.3f)' % (l_m, l_s))
         print('Recall: %.3f%% (+/-%.3f)' % (r_m, r_s))
@@ -993,7 +1019,8 @@ class Machine_Learn_Static(object):
         print('MCC: %.3f%% (+/-%.3f)' % (m_m, m_s))
         print('RMSE: %.3f%% (+/-%.3f)' % (rm_m, rm_s))
         metric = pd.DataFrame({"algorithm": [algorithm], "accuracy": [a_m], "recall": [r_m],
-                               "precision": [p_m], "f1": [f_m], "mcc": [m_m], "rmse": [rm_m], "trainingtime" : [tt_m]})
+                               "precision": [p_m], "f1": [f_m], "mcc": [m_m], "rmse": [rm_m],
+                               "loss": [l_m], "trainingtime" : [tt_m]})
         metrics = metrics.append(metric)
         return metrics
 
@@ -1074,41 +1101,35 @@ def HAR_classification():
     # run machine learning algorithms - uncomment this if you want to run
     metrics = pd.DataFrame(columns=["algorithm", "accuracy", "recall", "precision", "f1", "mcc", "rmse", "trainingtime", "loss"])
 
-    # Logistic Regression
-    metrics = classification.logic_regress_fit(x_train, y_train, x_test, y_test, metrics)
-
-    # Naive Bayes
-    metrics = classification.naive_bayes_regress_fit(x_train, y_train, x_test, y_test, metrics)
-
-    # Desicion Tree
-    metrics = classification.decision_tree_fit(x_train, y_train, x_test, y_test, metrics)
-
-    # Support Vector Classification
-    metrics = classification.support_vector_fit(x_train, y_train, x_test, y_test, metrics)
-
-    # k-nearest neighbors
-    metrics = classification.k_nearest_neighbors_fit(x_train, y_train, x_test, y_test, metrics)
-
-    # random forest
-    metrics = classification.random_forest_fit(x_train, y_train, x_test, y_test, metrics)
-
-    # bagging
-    metrics = classification.bagging_fit(x_train, y_train, x_test, y_test, metrics)
-
-    # extra tree
-    metrics = classification.extra_tree_fit(x_train, y_train, x_test, y_test, metrics)
-
-    # gradient boosting
-    metrics = classification.gradient_boosting_fit(x_train, y_train, x_test, y_test, metrics)
-
-    # Multilayer Perceptron
-    metrics = classification.neural_network_fit(x_train, y_train, x_test, y_test, metrics)
-
-
-    print("Summary of results:")
-    print(metrics)
-
-
+    # # Logistic Regression
+    # metrics = classification.logic_regress_fit(x_train, y_train, x_test, y_test, metrics)
+    #
+    # # Naive Bayes
+    # metrics = classification.naive_bayes_regress_fit(x_train, y_train, x_test, y_test, metrics)
+    #
+    # # Desicion Tree
+    # metrics = classification.decision_tree_fit(x_train, y_train, x_test, y_test, metrics)
+    #
+    # # Support Vector Classification
+    # metrics = classification.support_vector_fit(x_train, y_train, x_test, y_test, metrics)
+    #
+    # # k-nearest neighbors
+    # metrics = classification.k_nearest_neighbors_fit(x_train, y_train, x_test, y_test, metrics)
+    #
+    # # random forest
+    # metrics = classification.random_forest_fit(x_train, y_train, x_test, y_test, metrics)
+    #
+    # # bagging
+    # metrics = classification.bagging_fit(x_train, y_train, x_test, y_test, metrics)
+    #
+    # # extra tree
+    # metrics = classification.extra_tree_fit(x_train, y_train, x_test, y_test, metrics)
+    #
+    # # gradient boosting
+    # metrics = classification.gradient_boosting_fit(x_train, y_train, x_test, y_test, metrics)
+    #
+    # # Multilayer Perceptron
+    # metrics = classification.neural_network_fit(x_train, y_train, x_test, y_test, metrics)
 
 
 
@@ -1128,6 +1149,8 @@ def HAR_classification():
     #print(x_train.shape)
     train_X = x_train.values.reshape(x_train.shape[0], timesteps + 1, n_features)
     test_X = x_test.values.reshape(x_test.shape[0], timesteps + 1, n_features)
+    #train_X = x_train.values.reshape(x_train.shape[0], 1, timesteps + 1, n_features) # for CNN with LSTM
+    #test_X = x_test.values.reshape(x_test.shape[0], 1, timesteps + 1, n_features) # for CNN with LSTM
 
 
 
@@ -1154,9 +1177,8 @@ def HAR_classification():
     rmses = list()
     training_times = list()
 
-    for r in range(repeats):
-        loss, accuracy, rmse, recall, precision, f1, mcc, training_time = classification.evaluate_CNN_model(train_X, train_Y, test_X, test_Y) # run CNN
-        # loss, accuracy, rmse, recall, precision, f1, mcc = classification.evaluate_CNN_LSTM_model(train_X, train_Y, test_X, test_Y) # run CNN with LSTM layers
+    for r in range(0):
+        loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model = classification.evaluate_CNN_model(train_X, train_Y, test_X, test_Y) # run CNN
         accuracy = accuracy * 100.0
         print('>#%d: %.3f' % (r+1, accuracy))
         accuracy = accuracy / 100.0
@@ -1168,11 +1190,12 @@ def HAR_classification():
         f1s.append(f1)
         mccs.append(mcc)
         training_times.append(training_time)
+        # Save the model
+        model.save("CNN-{}.h5".format(r))
     metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "CNN", metrics)
 
-    for r in range(repeats):
+    for r in range(0):
         loss, accuracy, rmse, recall, precision, f1, mcc, training_time = classification.evaluate_LSTM_model(train_X, train_Y, test_X, test_Y) # run LSTM
-        #loss, accuracy, rmse, recall, precision, f1, mcc = classification.evaluate_CNN_LSTM_model(train_X, train_Y, test_X, test_Y) # run CNN with LSTM layers
         accuracy = accuracy * 100.0
         print('>#%d: %.3f' % (r+1, accuracy))
         accuracy = accuracy / 100.0
@@ -1186,6 +1209,21 @@ def HAR_classification():
         training_times.append(training_time)
     metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "LSTM", metrics)
 
+    for r in range(0):
+        loss, accuracy, rmse, recall, precision, f1, mcc, training_time = classification.evaluate_CNN_LSTM_model(train_X, train_Y, test_X, test_Y) # run CNN with LSTM layers
+        accuracy = accuracy * 100.0
+        print('>#%d: %.3f' % (r+1, accuracy))
+        accuracy = accuracy / 100.0
+        accuracies.append(accuracy)
+        losses.append(loss)
+        rmses.append(rmse)
+        recalls.append(recall)
+        precisions.append(precision)
+        f1s.append(f1)
+        mccs.append(mcc)
+        training_times.append(training_time)
+    metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "CNN with LSTM", metrics)
+
     classification.plot_metrics(metrics)
     print("#################### end ###################")
     print("Summary of results:")
@@ -1198,5 +1236,7 @@ if __name__ == '__main__':
 
     warnings.filterwarnings("ignore", category=sklearn.exceptions.UndefinedMetricWarning)
     warnings.simplefilter(action='ignore', category=FutureWarning)
+
+    #sys.stdout = open('python-console-output', 'w')
     HAR_classification()
 
