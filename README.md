@@ -343,6 +343,7 @@ src/
 └── testing_data_preparation.ipynb -- data preparation of testing set (Python notebook)
 └── api.py -- API for on the fly prediction, works in combination with Node-RED
 └── testing_samples-for-on-the-fly.csv -- already prepared input data for the prediction (sensor data with 40 lagged features)
+└── node-red-flow.txt -- contains Node-RED flow for on the fly prediction
 
 ```
 
@@ -371,7 +372,7 @@ tensorboard --logdir=src/logs/
 
 ## On the fly prediction: Node-RED with Python API
 
-The Node-RED flow is in file xx. 
+The Node-RED flow is in file node-red-flow.txt. 
 Run Node-RED in the terminal using:
 ```
 node-red --max-old-space-size=4096
