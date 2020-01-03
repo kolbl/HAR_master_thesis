@@ -340,7 +340,10 @@ src/
 ├── HAR_classification.py -- classification algorithms (Python script) 
 ├── labels_testing_set.csv -- timestamp, segment and activities for test set
 ├── testing_data_analysis.ipynb -- exploratory data analysis of testing set (Python notebook)
-└── testing_data_preparation.ipynb -- data preparation of testing set(Python notebook)
+└── testing_data_preparation.ipynb -- data preparation of testing set (Python notebook)
+└── api.py -- API for on the fly prediction, works in combination with Node-RED
+└── testing_samples-for-on-the-fly.csv -- already prepared input data for the prediction (sensor data with 40 lagged features)
+
 ```
 
 
@@ -366,4 +369,15 @@ Start TensorBoard for CNN and LSTM logs:
 tensorboard --logdir=src/logs/
 ```
 
- 
+## On the fly prediction: Node-RED with Python API
+
+The Node-RED flow is in file xx. 
+Run Node-RED in the terminal using:
+```
+node-red --max-old-space-size=4096
+```
+
+Import the flow, set the file paths correctly in the file nodes and 
+deploy it. Concurrently, run the api.py code. Watch the debug space of 
+Node-RED to see the server response. 
+

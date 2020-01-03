@@ -89,6 +89,9 @@ import itertools
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from sklearn.metrics import log_loss
 import sys
+from keras.models import *
+from keras.layers import Input, Dense, merge, multiply
+
 
 
 class Machine_Learn_Static(object):
@@ -642,7 +645,7 @@ class Machine_Learn_Static(object):
         # setting up TensorBoard
         tensorboard = TensorBoard(log_dir="logs/cnn-lstm/{}".format(time.time()))
 
-        ptimizer = optimizers.Nadam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, schedule_decay=0.004)
+        optimizer = optimizers.Nadam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, schedule_decay=0.004)
 
         model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['acc'])
         # early stopping
@@ -727,7 +730,17 @@ class Machine_Learn_Static(object):
         print(classification_report(ground_truth, predictions))
         return loss, accuracy, rmse, recall, precision, f1, mcc, training_time
 
-
+    def build_model(self, train_X):
+          inputs = Input(shape=(train_X.shape[0], train_X.shape[1], train_X.shape[2]))
+          dense8 = Dense(8, activation='relu', kernel_regularizer=regularizers.l2(0.0001))(inputs)
+          attention_probs = Dense(8, activation='sigmoid', name='attention_probs')(dense8)
+          attention_mul = multiply([ dense8, attention_probs], name='attention_mul')
+          dense24 = Dense(24, kernel_regularizer=regularizers.l2(0.01), activation='softmax')(attention_mul)
+          model = Model(input=[inputs], output=dense24)
+          model.compile(optimizer='adam',
+                        loss='categorical_crossentropy',
+                        metrics=['accuracy'])
+          return model
 
     # fit and evaluate a CNN model
     def evaluate_CNN_model(self, train_X, train_y, test_X, test_y):
@@ -759,6 +772,7 @@ class Machine_Learn_Static(object):
 
         model = Sequential()
         # model.add(BatchNormalization(input_shape=(train_X.shape[1], train_X.shape[2])))
+
         model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(train_X.shape[1], train_X.shape[2]))) # , kernel_regularizer=regularizers.l2(0.0001)
         # model.add(Conv1D(filters=64, kernel_size=2, activation='relu'))
         # model.add(BatchNormalization())
@@ -770,6 +784,13 @@ class Machine_Learn_Static(object):
         #model.add(BatchNormalization())
         model.add(Dropout(0.5))
         model.add(Dense(n_outputs, activation='softmax'))
+
+
+
+       # model = self.build_model(train_X) #todo: attention!
+
+
+
 
         # setting up TensorBoard
         tensorboard = TensorBoard(log_dir="logs/cnn/{}".format(time.time()))
@@ -1028,6 +1049,7 @@ class Machine_Learn_Static(object):
 def HAR_classification():
     # read a dataset
 
+
     classification = Machine_Learn_Static()
 
     matplotlib.backend_bases.register_backend('pdf', FigureCanvasPgf)
@@ -1073,8 +1095,12 @@ def HAR_classification():
             reframed_test = reframed_test.drop(["var" + str(n_features +1) + "(t-" + str(i + 1) + ")"], axis=1)  # getting rid of class label
             reframed_training = reframed_training.drop(["var" + str(n_features +1) + "(t-" + str(i + 1) + ")"], axis=1)  # getting rid of class label
 
+
+        #reframed_test.to_csv("testing-samples-for-on-the-fly.csv", sep=';', encoding='utf-8', index=False)
+
         x_train, y_train = reframed_training.iloc[:, :-1], reframed_training.iloc[:, -1]
         x_test, y_test = reframed_test.iloc[:, :-1], reframed_test.iloc[:, -1]
+
 
 
         # print(x_train)
@@ -1166,7 +1192,7 @@ def HAR_classification():
 
 
 
-    repeats = 10
+    repeats = 1
     # repeat experiment
     accuracies = list()
     losses = list()
@@ -1177,7 +1203,7 @@ def HAR_classification():
     rmses = list()
     training_times = list()
 
-    for r in range(0):
+    for r in range(repeats):
         loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model = classification.evaluate_CNN_model(train_X, train_Y, test_X, test_Y) # run CNN
         accuracy = accuracy * 100.0
         print('>#%d: %.3f' % (r+1, accuracy))
@@ -1191,10 +1217,10 @@ def HAR_classification():
         mccs.append(mcc)
         training_times.append(training_time)
         # Save the model
-        model.save("CNN-{}.h5".format(r))
+        model.save("models/CNN-{}.h5".format(r+1))
     metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "CNN", metrics)
 
-    for r in range(0):
+    for r in range(repeats):
         loss, accuracy, rmse, recall, precision, f1, mcc, training_time = classification.evaluate_LSTM_model(train_X, train_Y, test_X, test_Y) # run LSTM
         accuracy = accuracy * 100.0
         print('>#%d: %.3f' % (r+1, accuracy))
@@ -1207,9 +1233,11 @@ def HAR_classification():
         f1s.append(f1)
         mccs.append(mcc)
         training_times.append(training_time)
+        # Save the model
+        model.save("models/LSTM-{}.h5".format(r+1))
     metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "LSTM", metrics)
 
-    for r in range(0):
+    for r in range(repeats):
         loss, accuracy, rmse, recall, precision, f1, mcc, training_time = classification.evaluate_CNN_LSTM_model(train_X, train_Y, test_X, test_Y) # run CNN with LSTM layers
         accuracy = accuracy * 100.0
         print('>#%d: %.3f' % (r+1, accuracy))
@@ -1222,6 +1250,8 @@ def HAR_classification():
         f1s.append(f1)
         mccs.append(mcc)
         training_times.append(training_time)
+        # Save the model
+        model.save("models/CNN-LSTM-{}.h5".format(r+1))
     metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "CNN with LSTM", metrics)
 
     classification.plot_metrics(metrics)
