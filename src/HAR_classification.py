@@ -90,7 +90,12 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from sklearn.metrics import log_loss
 import sys
 from keras.models import *
-from keras.layers import Input, Dense, merge, multiply
+from keras.layers import Input, Dense, merge, multiply, Embedding, GlobalAveragePooling1D
+from keras.layers import merge
+from keras.layers.core import *
+from keras.layers.recurrent import LSTM
+from keras.models import *
+import pickle
 
 
 
@@ -134,6 +139,8 @@ class Machine_Learn_Static(object):
         # print(y_test)
         # print("predicted: ")
         # print(predict)
+        pickle.dump(model, open("models/log-reg-model.sav", 'wb'))
+        pickle.dump(model, open("models/log-reg-model.pkl", 'wb'))
         self.plot_confusion_matrix("Logistic Regression", y_test, predict, classes=class_names)
 
         return metrics
@@ -329,6 +336,8 @@ class Machine_Learn_Static(object):
         # printing the confusion matrix
         class_names = unique_labels(y_train)
         # Plot non-normalized confusion matrix
+        pickle.dump(model, open("models/mlp-model.sav", 'wb'))
+        pickle.dump(model, open("models/mlp-model.pkl", 'wb'))
         self.plot_confusion_matrix("Multilayer Perceptron", y_test, predict, classes=class_names)
         return metrics
 
@@ -651,6 +660,7 @@ class Machine_Learn_Static(object):
         # early stopping
         es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=5)
 
+
         # fit network
         start = time.time()
         history = model.fit(train_X, train_y, epochs=50, batch_size=5, verbose=2, shuffle=False, validation_split=0.2, callbacks=[es, tensorboard])
@@ -728,19 +738,186 @@ class Machine_Learn_Static(object):
 
         print("classification report:")
         print(classification_report(ground_truth, predictions))
-        return loss, accuracy, rmse, recall, precision, f1, mcc, training_time
+        return loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model
 
     def build_model(self, train_X):
-          inputs = Input(shape=(train_X.shape[0], train_X.shape[1], train_X.shape[2]))
+          inputs = Input(shape=(train_X.shape[1], train_X.shape[2]))
           dense8 = Dense(8, activation='relu', kernel_regularizer=regularizers.l2(0.0001))(inputs)
           attention_probs = Dense(8, activation='sigmoid', name='attention_probs')(dense8)
           attention_mul = multiply([ dense8, attention_probs], name='attention_mul')
-          dense24 = Dense(24, kernel_regularizer=regularizers.l2(0.01), activation='softmax')(attention_mul)
+          dense24 = Dense(24, kernel_regularizer=regularizers.l2(0.0001), activation='softmax')(attention_mul)
           model = Model(input=[inputs], output=dense24)
           model.compile(optimizer='adam',
                         loss='categorical_crossentropy',
                         metrics=['accuracy'])
           return model
+
+
+    def attention_3d_block(self, inputs):
+        # inputs.shape = (batch_size, time_steps, input_dim)
+        input_dim = int(inputs.shape[2])
+        a = Permute((2, 1))(inputs) # 24 instead of 1?
+        time_steps = 41
+        a = Reshape((input_dim, time_steps))(a) # this line is not useful. It's just to know which dimension is what.
+        a = Dense(time_steps, activation='softmax')(a)
+        if True:
+            a = Lambda(lambda x: K.mean(x, axis=1), name='dim_reduction')(a)
+            a = RepeatVector(input_dim)(a)
+        a_probs = Permute((2, 1), name='attention_vec')(a)
+        output_attention_mul = multiply([inputs, a_probs], name='attention_mul')
+        return output_attention_mul
+
+    def model_attention_applied_before_lstm(self):
+        time_steps = 41
+        input_dim = 83
+        inputs = Input(shape=(time_steps, input_dim,))
+        attention_mul = self.attention_3d_block(inputs)
+        units = 8
+        attention_mul = LSTM(units, return_sequences=False)(attention_mul)
+        output = Dense(24, activation='softmax')(attention_mul)
+        model = Model(input=[inputs], output=output)
+        return model
+
+    # fit and evaluate a CNN model
+    def evaluate_CNN_attention_model(self, train_X, train_y, test_X, test_y):
+        # https://machinelearningmastery.com/cnn-models-for-human-activity-recognition-time-series-classification/
+
+        def recall_m(y_true, y_pred):
+            true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+            possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+            recall = true_positives / (possible_positives + K.epsilon())
+            return recall
+
+        def precision_m(y_true, y_pred):
+                true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+                predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+                precision = true_positives / (predicted_positives + K.epsilon())
+                return precision
+
+        def f1_m(y_true, y_pred):
+            precision = precision_m(y_true, y_pred)
+            recall = recall_m(y_true, y_pred)
+            return 2*((precision*recall)/(precision+recall+K.epsilon()))
+
+        n_outputs = 24  # number of classes
+        epochs = 100
+
+        bn = BatchNormalization()
+        # batch normalisation: https://machinelearningmastery.com/how-to-accelerate-learning-of-deep-neural-networks-with-batch-normalization/
+        # learning rate: https://machinelearningmastery.com/learning-rate-for-deep-learning-neural-networks/
+
+        # model = Sequential()
+        # model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(train_X.shape[1], train_X.shape[2])))
+        # model.add(MaxPooling1D(pool_size=2))
+        # model.add(Flatten())
+        # model.add(Dense(64, activation='relu')) # , kernel_regularizer=regularizers.l2(0.0001)
+        # model.add(Dropout(0.5))
+        # model.add(Dense(n_outputs, activation='softmax'))
+
+
+        model = self.model_attention_applied_before_lstm()
+
+
+
+
+
+        # setting up TensorBoard
+        tensorboard = TensorBoard(log_dir="logs/cnn/{}".format(time.time()))
+
+        optimizer = optimizers.Nadam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, schedule_decay=0.004) # 67%
+        model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['acc']) # ,f1_m,precision_m, recall_m
+        # model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc']) # ,f1_m,precision_m, recall_m
+
+        # early stopping
+        es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=5)
+
+        # fit network
+        start = time.time()
+        history = model.fit(train_X, train_y, epochs=epochs, batch_size=5, verbose=2, shuffle=False, validation_split=0.25, callbacks=[es, tensorboard])
+        stop = time.time()
+        training_time = stop - start
+        print(f"CNN training time: {stop - start}s")
+        print(model.summary())
+
+        pyplot.clf()
+        pyplot.plot(history.history['loss'])
+        pyplot.plot(history.history['val_loss'])
+        pyplot.plot(history.history['acc'])
+        pyplot.title('CNN: model train vs validation loss and accuracy')
+        pyplot.ylabel('loss')
+        pyplot.xlabel('epoch')
+        pyplot.legend(['train', 'validation', 'accuracy'], loc='upper right')
+        # pyplot.show()
+        pyplot.savefig('figures/CNN-result-plot.pgf', dpi=300)
+        pyplot.savefig('figures/CNN-result-plot.png', dpi=300)
+
+
+        # plot metrics
+        pyplot.clf()
+        pyplot.plot(history.history['acc'])
+        pyplot.savefig('figures/CNN-history.png', dpi=300)
+        pyplot.savefig('figures/CNN-history.pgf', dpi=300)
+        #pyplot.show()
+
+        print("CNN history:")
+        print(history.history['loss'])
+        print(history.history['acc'])
+        print(history.history['val_loss'])
+        print(history.history['val_acc'])
+
+
+        #print("metrics are ", model.metrics_names)
+        loss, accuracy = model.evaluate(test_X, test_y, verbose=2)
+
+        yhat = model.predict(test_X, verbose=1)
+        y_pred = model.predict_classes(test_X)
+
+        # reverse one hot encoding
+        predictions = pd.DataFrame(y_pred)
+        trues = pd.DataFrame(test_y)
+
+        ground_truth = trues.idxmax(1).values
+        class_names = unique_labels(train_y)
+
+        # add 1 to make sure the classes are mapped correctly with labels
+        ground_truth = ground_truth + 1
+        predictions += 1
+        # class_names = unique_labels(ground_truth)
+        class_names = unique_labels(list(range(1, 25)))
+
+        self.plot_confusion_matrix("CNN", ground_truth, predictions, classes=class_names)
+
+        recall = round(recall_score(ground_truth, predictions, average="weighted", labels=np.unique(predictions)), 4)
+        precision = round(precision_score(ground_truth, predictions, average="weighted", labels=np.unique(predictions)), 4)
+        f1 = round(f1_score(ground_truth, predictions, average="weighted", labels=np.unique(predictions)), 4)
+        mcc = round(matthews_corrcoef(ground_truth, predictions), 4)
+
+        # print metrics
+        print(history.history['loss'])
+        print(history.history['acc'])
+        print(history.history['val_loss'])
+        print(history.history['val_acc'])
+        print("recall", recall)
+        print("precision", precision)
+        print("f1", f1)
+        print("mcc", mcc)
+
+
+
+        rmse = sqrt(mean_squared_error(ground_truth, predictions))
+        print('RMSE: %.3f' % rmse)
+
+
+        print("classification report:")
+        print(classification_report(ground_truth, predictions))
+
+        f = plt.figure()
+        f.clear()
+        plt.close(f)
+
+
+        return loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model
+
 
     # fit and evaluate a CNN model
     def evaluate_CNN_model(self, train_X, train_y, test_X, test_y):
@@ -773,7 +950,7 @@ class Machine_Learn_Static(object):
         model = Sequential()
         # model.add(BatchNormalization(input_shape=(train_X.shape[1], train_X.shape[2])))
 
-        model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(train_X.shape[1], train_X.shape[2]))) # , kernel_regularizer=regularizers.l2(0.0001)
+        model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(train_X.shape[1], train_X.shape[2]))) # , kernel_regularizer=regularizers.l2(0.0001) # 41, 83
         # model.add(Conv1D(filters=64, kernel_size=2, activation='relu'))
         # model.add(BatchNormalization())
         # model.add(Dropout(0.5))
@@ -787,7 +964,8 @@ class Machine_Learn_Static(object):
 
 
 
-       # model = self.build_model(train_X) #todo: attention!
+        #model = self.build_model(train_X) #todo: attention!
+        #model = self.model_attention_applied_before_lstm()
 
 
 
@@ -933,6 +1111,7 @@ class Machine_Learn_Static(object):
 
 
 
+
         # fit network
         start  = time.time()
         history = model.fit(train_X, train_y, epochs=50, batch_size=4, verbose=2, shuffle=False, validation_split=0.2, callbacks=[es, tensorboard])
@@ -1015,7 +1194,7 @@ class Machine_Learn_Static(object):
         f.clear()
         plt.close(f)
 
-        return loss, accuracy, rmse, recall, precision, f1, mcc, training_time
+        return loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model
 
 
 
@@ -1127,35 +1306,35 @@ def HAR_classification():
     # run machine learning algorithms - uncomment this if you want to run
     metrics = pd.DataFrame(columns=["algorithm", "accuracy", "recall", "precision", "f1", "mcc", "rmse", "trainingtime", "loss"])
 
-    # # Logistic Regression
-    # metrics = classification.logic_regress_fit(x_train, y_train, x_test, y_test, metrics)
-    #
-    # # Naive Bayes
-    # metrics = classification.naive_bayes_regress_fit(x_train, y_train, x_test, y_test, metrics)
-    #
-    # # Desicion Tree
-    # metrics = classification.decision_tree_fit(x_train, y_train, x_test, y_test, metrics)
-    #
-    # # Support Vector Classification
-    # metrics = classification.support_vector_fit(x_train, y_train, x_test, y_test, metrics)
-    #
-    # # k-nearest neighbors
-    # metrics = classification.k_nearest_neighbors_fit(x_train, y_train, x_test, y_test, metrics)
-    #
-    # # random forest
-    # metrics = classification.random_forest_fit(x_train, y_train, x_test, y_test, metrics)
-    #
-    # # bagging
-    # metrics = classification.bagging_fit(x_train, y_train, x_test, y_test, metrics)
-    #
-    # # extra tree
-    # metrics = classification.extra_tree_fit(x_train, y_train, x_test, y_test, metrics)
-    #
-    # # gradient boosting
-    # metrics = classification.gradient_boosting_fit(x_train, y_train, x_test, y_test, metrics)
-    #
-    # # Multilayer Perceptron
-    # metrics = classification.neural_network_fit(x_train, y_train, x_test, y_test, metrics)
+    # Logistic Regression
+    metrics = classification.logic_regress_fit(x_train, y_train, x_test, y_test, metrics)
+
+    # Naive Bayes
+    metrics = classification.naive_bayes_regress_fit(x_train, y_train, x_test, y_test, metrics)
+
+    # Desicion Tree
+    metrics = classification.decision_tree_fit(x_train, y_train, x_test, y_test, metrics)
+
+    # Support Vector Classification
+    metrics = classification.support_vector_fit(x_train, y_train, x_test, y_test, metrics)
+
+    # k-nearest neighbors
+    metrics = classification.k_nearest_neighbors_fit(x_train, y_train, x_test, y_test, metrics)
+
+    # random forest
+    metrics = classification.random_forest_fit(x_train, y_train, x_test, y_test, metrics)
+
+    # bagging
+    metrics = classification.bagging_fit(x_train, y_train, x_test, y_test, metrics)
+
+    # extra tree
+    metrics = classification.extra_tree_fit(x_train, y_train, x_test, y_test, metrics)
+
+    # gradient boosting
+    metrics = classification.gradient_boosting_fit(x_train, y_train, x_test, y_test, metrics)
+
+    # Multilayer Perceptron
+    metrics = classification.neural_network_fit(x_train, y_train, x_test, y_test, metrics)
 
 
 
@@ -1175,10 +1354,6 @@ def HAR_classification():
     #print(x_train.shape)
     train_X = x_train.values.reshape(x_train.shape[0], timesteps + 1, n_features)
     test_X = x_test.values.reshape(x_test.shape[0], timesteps + 1, n_features)
-    #train_X = x_train.values.reshape(x_train.shape[0], 1, timesteps + 1, n_features) # for CNN with LSTM
-    #test_X = x_test.values.reshape(x_test.shape[0], 1, timesteps + 1, n_features) # for CNN with LSTM
-
-
 
 
     # make classes start with class 0 instead of class 1
@@ -1192,7 +1367,7 @@ def HAR_classification():
 
 
 
-    repeats = 1
+    repeats = 10
     # repeat experiment
     accuracies = list()
     losses = list()
@@ -1202,6 +1377,24 @@ def HAR_classification():
     mccs = list()
     rmses = list()
     training_times = list()
+
+
+    for r in range(0):
+        loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model = classification.evaluate_CNN_attention_model(train_X, train_Y, test_X, test_Y) # run CNN
+        accuracy = accuracy * 100.0
+        print('>#%d: %.3f' % (r+1, accuracy))
+        accuracy = accuracy / 100.0
+        accuracies.append(accuracy)
+        losses.append(loss)
+        rmses.append(rmse)
+        recalls.append(recall)
+        precisions.append(precision)
+        f1s.append(f1)
+        mccs.append(mcc)
+        training_times.append(training_time)
+        # Save the model
+        model.save("models/CNN-attention-{}.h5".format(r+1))
+    metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "CNN with attention", metrics)
 
     for r in range(repeats):
         loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model = classification.evaluate_CNN_model(train_X, train_Y, test_X, test_Y) # run CNN
@@ -1221,7 +1414,7 @@ def HAR_classification():
     metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "CNN", metrics)
 
     for r in range(repeats):
-        loss, accuracy, rmse, recall, precision, f1, mcc, training_time = classification.evaluate_LSTM_model(train_X, train_Y, test_X, test_Y) # run LSTM
+        loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model = classification.evaluate_LSTM_model(train_X, train_Y, test_X, test_Y) # run LSTM
         accuracy = accuracy * 100.0
         print('>#%d: %.3f' % (r+1, accuracy))
         accuracy = accuracy / 100.0
@@ -1237,8 +1430,11 @@ def HAR_classification():
         model.save("models/LSTM-{}.h5".format(r+1))
     metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "LSTM", metrics)
 
+    train_X = x_train.values.reshape(x_train.shape[0], 1, timesteps + 1, n_features) # for CNN with LSTM
+    test_X = x_test.values.reshape(x_test.shape[0], 1, timesteps + 1, n_features) # for CNN with LSTM
+
     for r in range(repeats):
-        loss, accuracy, rmse, recall, precision, f1, mcc, training_time = classification.evaluate_CNN_LSTM_model(train_X, train_Y, test_X, test_Y) # run CNN with LSTM layers
+        loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model = classification.evaluate_CNN_LSTM_model(train_X, train_Y, test_X, test_Y) # run CNN with LSTM layers
         accuracy = accuracy * 100.0
         print('>#%d: %.3f' % (r+1, accuracy))
         accuracy = accuracy / 100.0
