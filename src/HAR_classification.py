@@ -111,7 +111,7 @@ class Machine_Learn_Static(object):
         self.et = ExtraTreesClassifier()  # using extra tree classification
         self.gb = GradientBoostingClassifier()   # using gradient boosting classification
         self.ada = AdaBoostClassifier()  # using ada boost
-        self.nn = MLPClassifier(activation='relu', early_stopping=True, hidden_layer_sizes=(5,5), max_iter=500,
+        self.mlp = MLPClassifier(activation='relu', early_stopping=True, hidden_layer_sizes=(5,5), max_iter=500,
                                 shuffle=False, solver='sgd', validation_fraction=0.2,
                                 batch_size=5, learning_rate='adaptive', learning_rate_init=0.0001)   # using Multilayer Perceptron
 
@@ -156,7 +156,7 @@ class Machine_Learn_Static(object):
         predict = self.gnb.predict(x_test)
         # prob = self.regressor.predict_proba(x_test)
         # print(prob)
-        metrics = self.print_metrics(model, y_test, x_test, predict, "Naive Bayes", metrics, training_time)
+        metrics = self.print_metrics(model, y_test, x_test, predict, "Gaussian Naive Bayes", metrics, training_time)
         # printing the confusion matrix
         class_names = unique_labels(y_train)
         # Plot non-normalized confusion matrix
@@ -283,11 +283,11 @@ class Machine_Learn_Static(object):
     def ada_boost_fit(self, x_train, y_train, x_test, y_test, metrics):
         # Now use ada boost to train dataset
         start = time.time()
-        model = self.et.fit(x_train, y_train)
+        model = self.ada.fit(x_train, y_train)
         stop = time.time()
         training_time = stop - start
         print(f"Ada Boost training time: {stop - start}s")
-        predict = self.et.predict(x_test)
+        predict = self.ada.predict(x_test)
         #prob = self.regressor.predict_proba(x_test)
         #print(prob)
         metrics = self.print_metrics(model, y_test, x_test, predict, "Ada Boost", metrics, training_time)
@@ -325,11 +325,11 @@ class Machine_Learn_Static(object):
     def neural_network_fit(self, x_train, y_train, x_test, y_test, metrics):
         # Now use gradient boosting to train dataset
         start = time.time()
-        model = self.gb.fit(x_train, y_train)
+        model = self.mlp.fit(x_train, y_train)
         stop = time.time()
         training_time = stop - start
         print(f"Multilayer Perceptron training time: {stop - start}s")
-        predict = self.gb.predict(x_test)
+        predict = self.mlp.predict(x_test)
         # prob = self.regressor.predict_proba(x_test)
         # print(prob)
         metrics = self.print_metrics(model, y_test, x_test, predict, "Multilayer Perceptron", metrics, training_time)
@@ -964,7 +964,7 @@ class Machine_Learn_Static(object):
 
 
 
-        #model = self.build_model(train_X) #todo: attention!
+        #model = self.build_model(train_X)
         #model = self.model_attention_applied_before_lstm()
 
 
@@ -1333,6 +1333,9 @@ def HAR_classification():
     # gradient boosting
     metrics = classification.gradient_boosting_fit(x_train, y_train, x_test, y_test, metrics)
 
+    # ada boost
+    metrics = classification.ada_boost_fit(x_train, y_train, x_test, y_test, metrics)
+
     # Multilayer Perceptron
     metrics = classification.neural_network_fit(x_train, y_train, x_test, y_test, metrics)
 
@@ -1433,22 +1436,22 @@ def HAR_classification():
     train_X = x_train.values.reshape(x_train.shape[0], 1, timesteps + 1, n_features) # for CNN with LSTM
     test_X = x_test.values.reshape(x_test.shape[0], 1, timesteps + 1, n_features) # for CNN with LSTM
 
-    for r in range(repeats):
-        loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model = classification.evaluate_CNN_LSTM_model(train_X, train_Y, test_X, test_Y) # run CNN with LSTM layers
-        accuracy = accuracy * 100.0
-        print('>#%d: %.3f' % (r+1, accuracy))
-        accuracy = accuracy / 100.0
-        accuracies.append(accuracy)
-        losses.append(loss)
-        rmses.append(rmse)
-        recalls.append(recall)
-        precisions.append(precision)
-        f1s.append(f1)
-        mccs.append(mcc)
-        training_times.append(training_time)
-        # Save the model
-        model.save("models/CNN-LSTM-{}.h5".format(r+1))
-    metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "CNN with LSTM", metrics)
+    # for r in range(repeats):
+    #     loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model = classification.evaluate_CNN_LSTM_model(train_X, train_Y, test_X, test_Y) # run CNN with LSTM layers
+    #     accuracy = accuracy * 100.0
+    #     print('>#%d: %.3f' % (r+1, accuracy))
+    #     accuracy = accuracy / 100.0
+    #     accuracies.append(accuracy)
+    #     losses.append(loss)
+    #     rmses.append(rmse)
+    #     recalls.append(recall)
+    #     precisions.append(precision)
+    #     f1s.append(f1)
+    #     mccs.append(mcc)
+    #     training_times.append(training_time)
+    #     # Save the model
+    #     model.save("models/CNN-LSTM-{}.h5".format(r+1))
+    # metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "CNN with LSTM", metrics)
 
     classification.plot_metrics(metrics)
     print("#################### end ###################")
