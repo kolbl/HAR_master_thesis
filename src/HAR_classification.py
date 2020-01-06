@@ -948,7 +948,7 @@ class Machine_Learn_Static(object):
         # learning rate: https://machinelearningmastery.com/learning-rate-for-deep-learning-neural-networks/
 
         model = Sequential()
-        # model.add(BatchNormalization(input_shape=(train_X.shape[1], train_X.shape[2])))
+        #model.add(BatchNormalization(input_shape=(train_X.shape[1], train_X.shape[2])))
 
         model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(train_X.shape[1], train_X.shape[2]))) # , kernel_regularizer=regularizers.l2(0.0001) # 41, 83
         # model.add(Conv1D(filters=64, kernel_size=2, activation='relu'))
@@ -1333,8 +1333,8 @@ def HAR_classification():
     # gradient boosting
     metrics = classification.gradient_boosting_fit(x_train, y_train, x_test, y_test, metrics)
 
-    # ada boost
-    metrics = classification.ada_boost_fit(x_train, y_train, x_test, y_test, metrics)
+    # # ada boost
+    #metrics = classification.ada_boost_fit(x_train, y_train, x_test, y_test, metrics)
 
     # Multilayer Perceptron
     metrics = classification.neural_network_fit(x_train, y_train, x_test, y_test, metrics)
@@ -1381,23 +1381,23 @@ def HAR_classification():
     rmses = list()
     training_times = list()
 
-
-    for r in range(0):
-        loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model = classification.evaluate_CNN_attention_model(train_X, train_Y, test_X, test_Y) # run CNN
-        accuracy = accuracy * 100.0
-        print('>#%d: %.3f' % (r+1, accuracy))
-        accuracy = accuracy / 100.0
-        accuracies.append(accuracy)
-        losses.append(loss)
-        rmses.append(rmse)
-        recalls.append(recall)
-        precisions.append(precision)
-        f1s.append(f1)
-        mccs.append(mcc)
-        training_times.append(training_time)
-        # Save the model
-        model.save("models/CNN-attention-{}.h5".format(r+1))
-    metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "CNN with attention", metrics)
+    #
+    # for r in range(repeats):
+    #     loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model = classification.evaluate_CNN_attention_model(train_X, train_Y, test_X, test_Y) # run CNN
+    #     accuracy = accuracy * 100.0
+    #     print('>#%d: %.3f' % (r+1, accuracy))
+    #     accuracy = accuracy / 100.0
+    #     accuracies.append(accuracy)
+    #     losses.append(loss)
+    #     rmses.append(rmse)
+    #     recalls.append(recall)
+    #     precisions.append(precision)
+    #     f1s.append(f1)
+    #     mccs.append(mcc)
+    #     training_times.append(training_time)
+    #     # Save the model
+    #     model.save("models/CNN-attention-{}.h5".format(r+1))
+    # metrics = classification.summarize_results(accuracies, losses, recalls, precisions, f1s, mccs, rmses, training_times, "CNN with attention", metrics)
 
     for r in range(repeats):
         loss, accuracy, rmse, recall, precision, f1, mcc, training_time, model = classification.evaluate_CNN_model(train_X, train_Y, test_X, test_Y) # run CNN
