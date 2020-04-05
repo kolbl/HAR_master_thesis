@@ -450,9 +450,17 @@ class Machine_Learn_Static(object):
         label = metrics["algorithm"]
         index = np.arange(len(label))
         plt.bar(index, loss)
-        # plt.xlabel('Genre', fontsize=5)
         plt.ylabel('Loss')
         plt.xticks(index, label, rotation=45, ha="right")
+
+        ax = plt.gca()
+        rects = ax.patches
+
+        for rect, l in zip(rects, loss):
+            height = rect.get_height()
+            ax.text(rect.get_x() + rect.get_width() / 2, height + 0.5, round(l, 2),
+                    ha='center', va='bottom')
+
         plt.title('Categorical Cross-Entropy Loss for different Machine Learning Algorithms')
         fig.tight_layout()
         fig.savefig('figures/loss.png', dpi=300)
@@ -464,16 +472,25 @@ class Machine_Learn_Static(object):
 
         fig = plt.figure()
         training_time = metrics["trainingtime"]
-        label = metrics["algorithm"]
-        index = np.arange(len(label))
+        labels = metrics["algorithm"]
+        index = np.arange(len(labels))
         plt.bar(index, training_time)
-        # plt.xlabel('Genre', fontsize=5)
         plt.ylabel('Training Time in seconds')
-        plt.xticks(index, label, rotation=45, ha="right")
+        plt.xticks(index, labels, rotation=45, ha="right")
+
+        ax = plt.gca()
+        rects = ax.patches
+
+        for rect, t in zip(rects, training_time):
+            height = rect.get_height()
+            ax.text(rect.get_x() + rect.get_width() / 2, height + 0.3, round(t, 2),
+                    ha='center', va='bottom')
+
         plt.title('Training Time for different Machine Learning Algorithms')
         fig.tight_layout()
         fig.savefig('figures/training-time.png', dpi=300)
         fig.savefig('figures/training-time.pgf', dpi=300)
+
 
 
 
