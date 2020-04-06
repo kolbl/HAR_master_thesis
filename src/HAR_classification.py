@@ -458,7 +458,7 @@ class Machine_Learn_Static(object):
 
         for rect, l in zip(rects, loss):
             height = rect.get_height()
-            ax.text(rect.get_x() + rect.get_width() / 2, height + 0.5, round(l, 2),
+            ax.text(rect.get_x() + rect.get_width() / 2, height + 0.3, round(l, 2),
                     ha='center', va='bottom')
 
         plt.title('Categorical Cross-Entropy Loss for different Machine Learning Algorithms')
