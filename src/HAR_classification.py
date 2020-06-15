@@ -588,8 +588,8 @@ class Machine_Learn_Static(object):
                ylabel='True label',
                xlabel='Predicted label\naccuracy={:0.2f}%; misclassified={:0.2f}%'.format(accuracy*100.0, misclass*100.0))
 
-        ax.xaxis.label.set_size(20)
-        ax.yaxis.label.set_size(20)
+        ax.xaxis.label.set_size(15)
+        ax.yaxis.label.set_size(15)
 
         bottom, top = ax.get_ylim()
         ax.set_ylim(bottom + 0.5, top - 0.5)
@@ -598,6 +598,13 @@ class Machine_Learn_Static(object):
         # Rotate the tick labels and set their alignment.
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
                  rotation_mode="anchor")
+
+
+
+        ax.xaxis.set_tick_params(labelsize=20)
+        ax.yaxis.set_tick_params(labelsize=20)
+
+
 
         # Loop over data dimensions and create text annotations.
         fmt = 'd'
@@ -689,10 +696,10 @@ class Machine_Learn_Static(object):
         pyplot.plot(history.history['loss'])
         pyplot.plot(history.history['val_loss'])
         pyplot.plot(history.history['acc'])
-        pyplot.title('model train vs validation loss')
+        pyplot.title('model training loss vs validation loss')
         pyplot.ylabel('loss')
         pyplot.xlabel('epoch')
-        pyplot.legend(['train', 'validation'], loc='upper right')
+        pyplot.legend(['training', 'validation'], loc='upper right')
         #pyplot.show()
 
         # plot metrics
@@ -741,10 +748,10 @@ class Machine_Learn_Static(object):
         pyplot.plot(history.history['loss'])
         pyplot.plot(history.history['val_loss'])
         pyplot.plot(history.history['acc'])
-        pyplot.title('CNN with LSTM Layers: model train vs validation loss and accuracy')
+        pyplot.title('CNN with LSTM Layers: model training vs validation loss and training accuracy')
         pyplot.ylabel('loss')
         pyplot.xlabel('epoch')
-        pyplot.legend(['train', 'validation', 'accuracy'], loc='upper right')
+        pyplot.legend(['training loss', 'validation loss', 'training accuracy'], loc='upper right')
         # pyplot.show()
         pyplot.savefig('figures/CNN-LSTM-result-plot.pgf', dpi=300)
         pyplot.savefig('figures/CNN-LSTM-result-plot.png', dpi=300)
@@ -860,10 +867,10 @@ class Machine_Learn_Static(object):
         pyplot.plot(history.history['loss'])
         pyplot.plot(history.history['val_loss'])
         pyplot.plot(history.history['acc'])
-        pyplot.title('CNN: model train vs validation loss and accuracy')
+        pyplot.title('CNN: training vs validation loss and training accuracy')
         pyplot.ylabel('loss')
         pyplot.xlabel('epoch')
-        pyplot.legend(['train', 'validation', 'accuracy'], loc='upper right')
+        pyplot.legend(['training loss', 'validation loss', 'training accuracy'], loc='upper right')
         # pyplot.show()
         pyplot.savefig('figures/CNN-result-plot.pgf', dpi=300)
         pyplot.savefig('figures/CNN-result-plot.png', dpi=300)
@@ -1015,10 +1022,10 @@ class Machine_Learn_Static(object):
         pyplot.plot(history.history['loss'])
         pyplot.plot(history.history['val_loss'])
         pyplot.plot(history.history['acc'])
-        pyplot.title('CNN: model train vs validation loss and accuracy')
+        pyplot.title('CNN: training vs validation loss and training accuracy')
         pyplot.ylabel('loss')
         pyplot.xlabel('epoch')
-        pyplot.legend(['train', 'validation', 'accuracy'], loc='upper right')
+        pyplot.legend(['training loss', 'validation loss', 'training accuracy'], loc='upper right')
         # pyplot.show()
         pyplot.savefig('figures/CNN-result-plot.pgf', dpi=300)
         pyplot.savefig('figures/CNN-result-plot.png', dpi=300)
@@ -1142,10 +1149,10 @@ class Machine_Learn_Static(object):
         pyplot.plot(history.history['loss'])
         pyplot.plot(history.history['val_loss'])
         pyplot.plot(history.history['acc'])
-        pyplot.title('LSTM: model train vs validation loss and accuracy')
+        pyplot.title('LSTM: training vs validation loss and training accuracy')
         pyplot.ylabel('loss')
         pyplot.xlabel('epoch')
-        pyplot.legend(['train', 'validation', 'accuracy'], loc='upper right')
+        pyplot.legend(['training loss', 'validation loss', 'training accuracy'], loc='upper right')
         # pyplot.show()
         pyplot.savefig('figures/LSTM-result-plot.png', dpi=300)
         pyplot.savefig('figures/LSTM-result-plot.pgf', dpi=300)
@@ -1319,9 +1326,10 @@ def HAR_classification():
 
 ############# standard machine learning algorithms #####################################################################
 
+    metrics = pd.DataFrame(columns=["algorithm", "accuracy", "recall", "precision", "f1", "mcc", "rmse", "trainingtime", "loss"])
+
 
     # run machine learning algorithms - uncomment this if you want to run
-    metrics = pd.DataFrame(columns=["algorithm", "accuracy", "recall", "precision", "f1", "mcc", "rmse", "trainingtime", "loss"])
 
     # Logistic Regression
     metrics = classification.logic_regress_fit(x_train, y_train, x_test, y_test, metrics)
